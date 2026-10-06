@@ -1,0 +1,100 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/bancada.gd" id="1_bancada"]
+[ext_resource type="Script" path="res://scripts/camera_orbita.gd" id="2_camera"]
+[ext_resource type="PackedScene" path="res://cenas/chave.tscn" id="3_chave"]
+[ext_resource type="PackedScene" path="res://cenas/chip.tscn" id="4_chip"]
+[ext_resource type="PackedScene" path="res://cenas/led.tscn" id="5_led"]
+
+[sub_resource type="Environment" id="ambiente"]
+background_mode = 1
+background_color = Color(0.1, 0.12, 0.17, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.75, 0.8, 0.9, 1)
+ambient_light_energy = 0.5
+
+[sub_resource type="StandardMaterial3D" id="material_mesa"]
+albedo_color = Color(0.45, 0.3, 0.18, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="malha_mesa"]
+material = SubResource("material_mesa")
+size = Vector3(6, 0.2, 3.5)
+
+[sub_resource type="StandardMaterial3D" id="material_protoboard"]
+albedo_color = Color(0.92, 0.92, 0.88, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="malha_protoboard"]
+material = SubResource("material_protoboard")
+size = Vector3(4.6, 0.08, 2)
+
+[sub_resource type="StandardMaterial3D" id="material_fio_a"]
+albedo_color = Color(0.3, 0.3, 0.3, 1)
+
+[sub_resource type="StandardMaterial3D" id="material_fio_b"]
+albedo_color = Color(0.3, 0.3, 0.3, 1)
+
+[sub_resource type="StandardMaterial3D" id="material_fio_s"]
+albedo_color = Color(0.3, 0.3, 0.3, 1)
+
+[sub_resource type="BoxMesh" id="malha_fio_entrada"]
+size = Vector3(0.95, 0.04, 0.04)
+
+[sub_resource type="BoxMesh" id="malha_fio_saida"]
+size = Vector3(1.05, 0.04, 0.04)
+
+[node name="Bancada" type="Node3D"]
+script = ExtResource("1_bancada")
+
+[node name="Ambiente" type="WorldEnvironment" parent="."]
+environment = SubResource("ambiente")
+
+[node name="Sol" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.9, 0.5, 0)
+shadow_enabled = true
+
+[node name="PivoCamera" type="Node3D" parent="."]
+rotation = Vector3(-0.6, 0, 0)
+script = ExtResource("2_camera")
+
+[node name="Camera3D" type="Camera3D" parent="PivoCamera"]
+position = Vector3(0, 0, 5.5)
+current = true
+
+[node name="Mesa" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.1, 0)
+mesh = SubResource("malha_mesa")
+
+[node name="Protoboard" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.04, 0)
+mesh = SubResource("malha_protoboard")
+
+[node name="ChaveA" parent="." instance=ExtResource("3_chave")]
+position = Vector3(-1.6, 0.08, -0.45)
+nome = "A"
+
+[node name="ChaveB" parent="." instance=ExtResource("3_chave")]
+position = Vector3(-1.6, 0.08, 0.45)
+nome = "B"
+
+[node name="Chip" parent="." instance=ExtResource("4_chip")]
+position = Vector3(0, 0.08, 0)
+
+[node name="LED" parent="." instance=ExtResource("5_led")]
+position = Vector3(1.6, 0.08, 0)
+
+[node name="FioA" type="MeshInstance3D" parent="."]
+position = Vector3(-0.875, 0.12, -0.45)
+mesh = SubResource("malha_fio_entrada")
+material_override = SubResource("material_fio_a")
+
+[node name="FioB" type="MeshInstance3D" parent="."]
+position = Vector3(-0.875, 0.12, 0.45)
+mesh = SubResource("malha_fio_entrada")
+material_override = SubResource("material_fio_b")
+
+[node name="FioS" type="MeshInstance3D" parent="."]
+position = Vector3(0.925, 0.12, 0)
+mesh = SubResource("malha_fio_saida")
+material_override = SubResource("material_fio_s")

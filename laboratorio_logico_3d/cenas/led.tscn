@@ -1,0 +1,85 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/led.gd" id="1_led"]
+
+[sub_resource type="StandardMaterial3D" id="material_led"]
+resource_local_to_scene = true
+transparency = 1
+albedo_color = Color(0.35, 0.05, 0.05, 0.85)
+roughness = 0.2
+emission = Color(1, 0.1, 0.05, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="CylinderMesh" id="malha_corpo"]
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.25
+
+[sub_resource type="SphereMesh" id="malha_topo"]
+radius = 0.15
+height = 0.3
+
+[sub_resource type="StandardMaterial3D" id="material_aro"]
+albedo_color = Color(0.5, 0.08, 0.08, 1)
+
+[sub_resource type="CylinderMesh" id="malha_aro"]
+material = SubResource("material_aro")
+top_radius = 0.18
+bottom_radius = 0.18
+height = 0.05
+
+[sub_resource type="StandardMaterial3D" id="material_perna"]
+metallic = 1.0
+roughness = 0.3
+albedo_color = Color(0.75, 0.75, 0.78, 1)
+
+[sub_resource type="BoxMesh" id="malha_perna"]
+material = SubResource("material_perna")
+size = Vector3(0.03, 0.2, 0.03)
+
+[node name="LED" type="Node3D"]
+script = ExtResource("1_led")
+
+[node name="PernaAnodo" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.1, 0)
+mesh = SubResource("malha_perna")
+
+[node name="PernaCatodo" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 0.1, 0)
+mesh = SubResource("malha_perna")
+
+[node name="Aro" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
+mesh = SubResource("malha_aro")
+
+[node name="Corpo" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("malha_corpo")
+material_override = SubResource("material_led")
+
+[node name="Topo" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.475, 0)
+mesh = SubResource("malha_topo")
+material_override = SubResource("material_led")
+
+[node name="Luz" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+visible = false
+light_color = Color(1, 0.2, 0.1, 1)
+light_energy = 2.0
+omni_range = 2.0
+
+[node name="Rotulo" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+billboard = 1
+text = "S"
+font_size = 64
+outline_size = 12
+
+[node name="Estado" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.4, 0)
+billboard = 1
+modulate = Color(1, 0.9, 0.3, 1)
+text = "0"
+font_size = 56
+outline_size = 12

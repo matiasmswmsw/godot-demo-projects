@@ -1,0 +1,114 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/modo_livre.gd" id="1_livre"]
+[ext_resource type="PackedScene" path="res://cenas/bancada.tscn" id="2_bancada"]
+
+[node name="ModoLivre" type="Node"]
+script = ExtResource("1_livre")
+
+[node name="Bancada" parent="." instance=ExtResource("2_bancada")]
+
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="Tela" type="Control" parent="Interface"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PainelPortas" type="PanelContainer" parent="Interface/Tela"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 16.0
+offset_bottom = 16.0
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelPortas"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Titulo" type="Label" parent="Interface/Tela/PainelPortas/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "MODO LIVRE – Escolha a porta:"
+
+[node name="BotoesPortas" type="GridContainer" parent="Interface/Tela/PainelPortas/Coluna"]
+layout_mode = 2
+columns = 4
+
+[node name="PainelInfo" type="PanelContainer" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -340.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 16.0
+grow_horizontal = 0
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelInfo"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LabelPorta" type="Label" parent="Interface/Tela/PainelInfo/Coluna"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
+theme_override_font_sizes/font_size = 28
+text = "Porta AND"
+
+[node name="LabelCI" type="Label" parent="Interface/Tela/PainelInfo/Coluna"]
+layout_mode = 2
+text = "CI 7408"
+
+[node name="LabelExpressao" type="Label" parent="Interface/Tela/PainelInfo/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "S = A · B"
+
+[node name="LabelEstado" type="Label" parent="Interface/Tela/PainelInfo/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "A=0  B=0  →  S=0"
+
+[node name="Separador" type="HSeparator" parent="Interface/Tela/PainelInfo/Coluna"]
+layout_mode = 2
+
+[node name="TituloTabela" type="Label" parent="Interface/Tela/PainelInfo/Coluna"]
+layout_mode = 2
+text = "Tabela-verdade:"
+
+[node name="Tabela" type="GridContainer" parent="Interface/Tela/PainelInfo/Coluna"]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 3
+
+[node name="Rodape" type="HBoxContainer" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -64.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Dica" type="Label" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "Clique nas chaves (ou teclas A e B) • Botão direito + arrastar: girar • Roda: zoom • Esc: menu"
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BotaoVoltar" type="Button" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+text = "Voltar ao menu"

@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/chip.gd" id="1_chip"]
+
+[sub_resource type="StandardMaterial3D" id="material_corpo"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="malha_corpo"]
+material = SubResource("material_corpo")
+size = Vector3(0.8, 0.25, 1.4)
+
+[sub_resource type="StandardMaterial3D" id="material_marca"]
+albedo_color = Color(0.25, 0.25, 0.27, 1)
+
+[sub_resource type="CylinderMesh" id="malha_marca"]
+material = SubResource("material_marca")
+top_radius = 0.08
+bottom_radius = 0.08
+height = 0.02
+
+[node name="Chip" type="Node3D"]
+script = ExtResource("1_chip")
+
+[node name="Corpo" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.25, 0)
+mesh = SubResource("malha_corpo")
+
+[node name="Marca" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.38, -0.55)
+mesh = SubResource("malha_marca")
+
+[node name="Pinos" type="Node3D" parent="."]
+
+[node name="Rotulo" type="Label3D" parent="."]
+position = Vector3(0, 0.38, 0.05)
+rotation = Vector3(-1.5708, 0, 0)
+text = "7408
+AND"
+font_size = 72
+outline_size = 0

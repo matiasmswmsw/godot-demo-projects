@@ -1,0 +1,124 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/menu.gd" id="1_menu"]
+[ext_resource type="PackedScene" path="res://cenas/chip.tscn" id="2_chip"]
+[ext_resource type="PackedScene" path="res://cenas/led.tscn" id="3_led"]
+
+[sub_resource type="Environment" id="ambiente"]
+background_mode = 1
+background_color = Color(0.07, 0.09, 0.14, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.75, 0.8, 0.9, 1)
+ambient_light_energy = 0.6
+
+[node name="Menu" type="Node3D"]
+script = ExtResource("1_menu")
+
+[node name="Ambiente" type="WorldEnvironment" parent="."]
+environment = SubResource("ambiente")
+
+[node name="Sol" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.8, 0.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(-1.2, 1.2, 3.2)
+rotation = Vector3(-0.3, 0, 0)
+current = true
+
+[node name="Vitrine" type="Node3D" parent="."]
+position = Vector3(0.6, 0, 0)
+
+[node name="Chip" parent="Vitrine" instance=ExtResource("2_chip")]
+rotation = Vector3(0, 0.6, 0)
+
+[node name="LED" parent="Vitrine" instance=ExtResource("3_led")]
+position = Vector3(0, 0, 1.0)
+
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="Tela" type="Control" parent="Interface"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 60.0
+offset_top = -250.0
+offset_right = 560.0
+offset_bottom = 250.0
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="Titulo" type="Label" parent="Interface/Tela/Coluna"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 52
+text = "Laboratório
+Lógico 3D"
+
+[node name="Subtitulo" type="Label" parent="Interface/Tela/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Aprenda as portas lógicas na bancada de Eletrônica Digital"
+autowrap_mode = 2
+
+[node name="Espaco" type="Control" parent="Interface/Tela/Coluna"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="BotaoLivre" type="Button" parent="Interface/Tela/Coluna"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Modo Livre (simulador)"
+
+[node name="BotaoDesafio" type="Button" parent="Interface/Tela/Coluna"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Modo Desafio (jogo)"
+
+[node name="BotaoComoJogar" type="Button" parent="Interface/Tela/Coluna"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Como jogar / Teoria"
+
+[node name="BotaoSair" type="Button" parent="Interface/Tela/Coluna"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Sair"
+
+[node name="LabelRecorde" type="Label" parent="Interface/Tela/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Recorde: 0 pontos"
+
+[node name="Creditos" type="Label" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -560.0
+offset_top = -60.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 15
+text = "Matias Scheid Warken e Lucas Ritter – IFSul Lajeado
+Técnico em Automação Industrial – Linguagem de Programação"
+horizontal_alignment = 2
