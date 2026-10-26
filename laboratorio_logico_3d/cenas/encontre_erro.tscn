@@ -1,0 +1,124 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/encontre_erro.gd" id="1_erro"]
+[ext_resource type="PackedScene" path="res://cenas/protoboard.tscn" id="2_protoboard"]
+
+[node name="EncontreErro" type="Node"]
+script = ExtResource("1_erro")
+
+[node name="Protoboard" parent="." instance=ExtResource("2_protoboard")]
+
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="Tela" type="Control" parent="Interface"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PainelPlacar" type="PanelContainer" parent="Interface/Tela"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 16.0
+offset_bottom = 16.0
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelPlacar"]
+layout_mode = 2
+
+[node name="Titulo" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
+theme_override_font_sizes/font_size = 26
+text = "ENCONTRE O ERRO"
+
+[node name="LabelRodada" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
+layout_mode = 2
+text = "Montagem 1 de 6"
+
+[node name="LabelPontos" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
+layout_mode = 2
+text = "Pontos: 0"
+
+[node name="LabelPorta" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+text = "Porta AND (74HC08)"
+
+[node name="LabelDica" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Teste as chaves (clique ou teclas A e B) e olhe os fios: vermelho = VCC, preto = GND. Atenção: às vezes a montagem está certa!"
+autowrap_mode = 2
+
+[node name="PainelRespostas" type="PanelContainer" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -316.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 16.0
+grow_horizontal = 0
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelRespostas"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Titulo" type="Label" parent="Interface/Tela/PainelRespostas/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "O que está errado?"
+
+[node name="Botoes" type="VBoxContainer" parent="Interface/Tela/PainelRespostas/Coluna"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PainelFeedback" type="PanelContainer" parent="Interface/Tela"]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -330.0
+offset_top = -210.0
+offset_right = 330.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelFeedback"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LabelFeedback" type="Label" parent="Interface/Tela/PainelFeedback/Coluna"]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Correto!"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BotaoProxima" type="Button" parent="Interface/Tela/PainelFeedback/Coluna"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Próxima montagem"
+
+[node name="BotaoVoltar" type="Button" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -64.0
+offset_right = 120.0
+offset_bottom = -16.0
+grow_vertical = 0
+text = "Menu"

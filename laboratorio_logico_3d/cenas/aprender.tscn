@@ -1,0 +1,86 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/aprender.gd" id="1_aprender"]
+[ext_resource type="Script" path="res://scripts/diagrama_ci.gd" id="2_diagrama"]
+
+[node name="Aprender" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_aprender")
+
+[node name="Fundo" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.07, 0.09, 0.14, 1)
+
+[node name="Margem" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="Linhas" type="HBoxContainer" parent="Margem"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ColunaBotoes" type="VBoxContainer" parent="Margem/Linhas"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Titulo" type="Label" parent="Margem/Linhas/ColunaBotoes"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
+theme_override_font_sizes/font_size = 30
+text = "APRENDER"
+
+[node name="Subtitulo" type="Label" parent="Margem/Linhas/ColunaBotoes"]
+layout_mode = 2
+text = "Escolha o CI:"
+
+[node name="BotoesCIs" type="VBoxContainer" parent="Margem/Linhas/ColunaBotoes"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Espaco" type="Control" parent="Margem/Linhas/ColunaBotoes"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BotaoComoJogar" type="Button" parent="Margem/Linhas/ColunaBotoes"]
+layout_mode = 2
+text = "Como jogar"
+
+[node name="BotaoProtoboard" type="Button" parent="Margem/Linhas/ColunaBotoes"]
+layout_mode = 2
+text = "Ver na protoboard"
+
+[node name="BotaoVoltar" type="Button" parent="Margem/Linhas/ColunaBotoes"]
+layout_mode = 2
+text = "Voltar ao menu"
+
+[node name="Diagrama" type="Control" parent="Margem/Linhas"]
+custom_minimum_size = Vector2(520, 560)
+layout_mode = 2
+script = ExtResource("2_diagrama")
+
+[node name="Texto" type="RichTextLabel" parent="Margem/Linhas"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 17
+theme_override_font_sizes/bold_font_size = 17
+bbcode_enabled = true
+text = "..."

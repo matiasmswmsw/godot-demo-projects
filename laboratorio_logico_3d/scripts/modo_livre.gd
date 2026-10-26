@@ -1,26 +1,29 @@
 # modo_livre.gd
 # MODO LIVRE (simulador): o usuário escolhe uma porta lógica e testa
 # todas as combinações das chaves A e B, vendo o LED e a tabela-verdade.
+# A protoboard já vem montada do jeito certo para a porta escolhida.
 extends Node
 
 # Porta lógica selecionada no momento.
 var porta_atual: String = "AND"
 
-@onready var bancada = $Bancada
+@onready var protoboard = $Protoboard
 @onready var botoes_portas: GridContainer = $Interface/Tela/PainelPortas/Coluna/BotoesPortas
 @onready var label_porta: Label = $Interface/Tela/PainelInfo/Coluna/LabelPorta
 @onready var label_ci: Label = $Interface/Tela/PainelInfo/Coluna/LabelCI
 @onready var label_expressao: Label = $Interface/Tela/PainelInfo/Coluna/LabelExpressao
 @onready var label_estado: Label = $Interface/Tela/PainelInfo/Coluna/LabelEstado
 @onready var tabela: GridContainer = $Interface/Tela/PainelInfo/Coluna/Tabela
+@onready var label_ligacoes: Label = $Interface/Tela/PainelInfo/Coluna/LabelLigacoes
 @onready var botao_voltar: Button = $Interface/Tela/Rodape/BotaoVoltar
 
 
 func _ready() -> void:
+	porta_atual = Global.porta_inicial # a tela Aprender pode escolher a porta
 	criar_botoes_portas()
-	bancada.entradas_mudaram.connect(_on_entradas_mudaram)
+	protoboard.chave_alternada.connect(_on_chave_alternada)
 	botao_voltar.pressed.connect(voltar_ao_menu)
-	selecionar_porta("AND")
+	selecionar_porta(porta_atual)
 
 
 # Cria um botão para cada porta da lista Global.PORTAS.
@@ -42,25 +45,25 @@ func criar_botoes_portas() -> void:
 func selecionar_porta(porta: String) -> void:
 	porta_atual = porta
 	label_porta.text = "Porta " + porta
-	label_ci.text = "CI " + Global.CIS[porta] + " (família 74xx)"
+	label_ci.text = "CI " + Global.CIS[porta] + " (linha 74HC)"
 	label_expressao.text = Global.EXPRESSOES[porta]
-	bancada.mostrar_porta(porta, Global.CIS[porta])
-	# A porta NOT tem só uma entrada, então a chave B é desativada.
-	bancada.usar_entrada_b(porta != "NOT")
+	# Monta a protoboard certa para esta porta (a NOT usa só a chave A).
+	protoboard.carregar(Circuito.montagem_correta(porta))
+	label_ligacoes.text = texto_ligacoes(Global.CIS[porta])
 	atualizar_saida()
 
 
-# Chamada pelo sinal da bancada sempre que uma chave muda.
-func _on_entradas_mudaram(_a: bool, _b: bool) -> void:
+# Chamada pelo sinal da protoboard sempre que uma chave muda.
+func _on_chave_alternada(_nome: String, _ligada: bool) -> void:
 	atualizar_saida()
 
 
-# Calcula a saída da porta atual e atualiza o LED, o texto e a tabela.
+# Lê o LED da protoboard e atualiza o texto e a tabela.
 func atualizar_saida() -> void:
-	var a: bool = bancada.a
-	var b: bool = bancada.b
-	var s: bool = Global.calcular_porta(porta_atual, a, b)
-	bancada.mostrar_saida(s)
+	var a: bool = protoboard.valor_chave("A")
+	var b: bool = protoboard.valor_chave("B")
+	# A saída vem da SIMULAÇÃO da protoboard (fios + pinagem do CI).
+	var s: bool = protoboard.resultado["leds"][0] == "aceso"
 
 	if porta_atual == "NOT":
 		label_estado.text = "A=%s  →  S=%s" % [Global.bit(a), Global.bit(s)]
@@ -86,13 +89,25 @@ func montar_tabela() -> void:
 			if porta_atual == "NOT" and valor_b:
 				continue # a NOT só precisa de 2 linhas (A = 0 e A = 1)
 			var s: bool = Global.calcular_porta(porta_atual, valor_a, valor_b)
-			var linha_atual: bool = (valor_a == bancada.a and valor_b == bancada.b)
+			var linha_atual: bool = (valor_a == protoboard.valor_chave("A") and valor_b == protoboard.valor_chave("B"))
 			adicionar_celula(Global.bit(valor_a), linha_atual, false)
 			if porta_atual == "NOT":
 				adicionar_celula("-", linha_atual, false)
 			else:
 				adicionar_celula(Global.bit(valor_b), linha_atual, false)
 			adicionar_celula(Global.bit(s), linha_atual, false)
+
+
+# Texto com as ligações da porta 1 do CI (pinos tirados da tabela de pinagem).
+func texto_ligacoes(modelo: String) -> String:
+	var porta1: Array = Global.PORTAS_DO_CI[modelo][0]
+	var t: String = "• Pino 14 (VCC) → trilha + (5 V)\n"
+	t += "• Pino 7 (GND) → trilha −\n"
+	t += "• Chave A → pino %d\n" % porta1[0]
+	if porta1.size() == 3:
+		t += "• Chave B → pino %d\n" % porta1[1]
+	t += "• Pino %d (saída) → resistor 330 Ω → LED → GND" % porta1[porta1.size() - 1]
+	return t
 
 
 # Cria uma "célula" (Label com fundo colorido) dentro da tabela.

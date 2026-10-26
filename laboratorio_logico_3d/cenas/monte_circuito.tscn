@@ -1,0 +1,149 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/monte_circuito.gd" id="1_monte"]
+[ext_resource type="PackedScene" path="res://cenas/protoboard.tscn" id="2_protoboard"]
+
+[node name="MonteCircuito" type="Node"]
+script = ExtResource("1_monte")
+
+[node name="Protoboard" parent="." instance=ExtResource("2_protoboard")]
+
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="Tela" type="Control" parent="Interface"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PainelObjetivo" type="PanelContainer" parent="Interface/Tela"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 16.0
+offset_bottom = 16.0
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelObjetivo"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Titulo" type="Label" parent="Interface/Tela/PainelObjetivo/Coluna"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
+theme_override_font_sizes/font_size = 26
+text = "MONTE O CIRCUITO"
+
+[node name="SeletorNiveis" type="HBoxContainer" parent="Interface/Tela/PainelObjetivo/Coluna"]
+layout_mode = 2
+
+[node name="LabelTitulo" type="Label" parent="Interface/Tela/PainelObjetivo/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Nível 1"
+
+[node name="LabelObjetivo" type="Label" parent="Interface/Tela/PainelObjetivo/Coluna"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Objetivo"
+autowrap_mode = 2
+
+[node name="LabelDica" type="Label" parent="Interface/Tela/PainelObjetivo/Coluna"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Clique num furo e depois noutro para ligar um fio. Furos da mesma coluna de 5 (a–e ou f–j) já estão ligados por dentro. CIs, LEDs e resistores estão fixos."
+autowrap_mode = 2
+
+[node name="LabelStatus" type="Label" parent="Interface/Tela/PainelObjetivo/Coluna"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 15
+text = "..."
+autowrap_mode = 2
+
+[node name="PainelTabela" type="PanelContainer" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -356.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 16.0
+grow_horizontal = 0
+
+[node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelTabela"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Titulo" type="Label" parent="Interface/Tela/PainelTabela/Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Pedido × Medido"
+
+[node name="Tabela" type="GridContainer" parent="Interface/Tela/PainelTabela/Coluna"]
+layout_mode = 2
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 3
+columns = 4
+
+[node name="LabelResultado" type="Label" parent="Interface/Tela/PainelTabela/Coluna"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "..."
+autowrap_mode = 2
+
+[node name="Rodape" type="HBoxContainer" parent="Interface/Tela"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -60.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="LabelCor" type="Label" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+text = "Cor do fio:"
+
+[node name="CoresFio" type="HBoxContainer" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+
+[node name="Espaco" type="Control" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="BotaoTestar" type="Button" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+text = "Testar circuito"
+
+[node name="BotaoDesfazer" type="Button" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+text = "Desfazer"
+
+[node name="BotaoLimpar" type="Button" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+text = "Limpar"
+
+[node name="BotaoProximo" type="Button" parent="Interface/Tela/Rodape"]
+visible = false
+layout_mode = 2
+text = "Próximo nível"
+
+[node name="BotaoVoltar" type="Button" parent="Interface/Tela/Rodape"]
+layout_mode = 2
+text = "Menu"

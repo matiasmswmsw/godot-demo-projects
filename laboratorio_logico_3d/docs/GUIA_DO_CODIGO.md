@@ -8,19 +8,33 @@ pequena alteração**. Este guia mostra onde está cada conceito no projeto. Lei
 ## 1. Ideia geral (como o programa funciona)
 
 1. O jogo começa na cena `menu.tscn` (definida em *Projeto → Configurações → Run → Main Scene*).
-2. O `Global` (script `global.gd`) é um **Autoload**: fica carregado o tempo todo e guarda
-   os pontos e a função `calcular_porta()`, que é **o "cérebro" da Eletrônica Digital** do jogo.
-3. A `bancada.tscn` é uma cena 3D que é **reaproveitada** no Modo Livre e no Desafio. Ela tem
-   2 chaves, 1 CI e 1 LED.
-4. Quando o usuário clica numa chave:
-   `chave.gd` emite o sinal `alternada` → `bancada.gd` recebe e emite `entradas_mudaram` →
-   `modo_livre.gd` (ou `desafio.gd`) recebe, chama `Global.calcular_porta()` e manda o resultado
-   para o LED com `bancada.mostrar_saida()`.
+2. O `Global` (`global.gd`) é um **Autoload**: fica carregado o tempo todo. Ele guarda os pontos,
+   os recordes, a **pinagem dos 7 CIs** e a função `calcular_porta()`.
+3. O `Circuito` (`circuito.gd`) é o **"cérebro elétrico"**: guarda o que está montado na protoboard
+   (CIs, chaves, resistores, LEDs e fios) e a função `simular()` diz se cada CI está alimentado e se
+   cada LED acende. Ele não desenha nada.
+4. A `protoboard.tscn` (`protoboard_3d.gd`) **desenha** um Circuito em 3D e recebe os cliques. É
+   reaproveitada em 4 cenas: Modo Livre, Descubra a porta, Encontre o erro e Monte o circuito.
 
 ```
-[Clique na chave] -> chave.gd --sinal alternada--> bancada.gd --sinal entradas_mudaram-->
-modo_livre.gd -> Global.calcular_porta(porta, a, b) -> bancada.mostrar_saida(s) -> led.gd acende/apaga
+[Clique na chave] -> protoboard_3d.gd muda a chave no Circuito
+                  -> Circuito.simular()  (fios + pinagem + Global.calcular_porta)
+                  -> LED aceso/apagado/queimado/piscando
+                  -> sinal chave_alternada -> modo_livre.gd (ou outro) atualiza a tela
 ```
+
+### Como funciona a simulação (`Circuito.simular()`)
+
+1. Cada furo pertence a um **nó elétrico**. Os 5 furos de uma coluna (a–e ou f–j) são o mesmo nó;
+   as trilhas + são o nó `VCC` e as trilhas − são o nó `GND` (`no_do_furo()`).
+2. Fios e chaves **juntam** nós (`_unir()`). A chave ligada junta a perna do meio com o +; desligada,
+   com o −.
+3. O nó VCC vale 1 e o GND vale 0. Um CI só funciona se o pino 14 estiver no 1 e o pino 7 no 0
+   (`_estado_alimentacao()`); invertido = queimado.
+4. Cada porta lê os nós das entradas e escreve no nó da saída (`_calcular_portas_do_ci()`). Isso se
+   repete num `while`, porque a saída de uma porta pode ser a entrada de outra. Entrada solta vira
+   "instável" (o LED pisca), como num CI 74HC de verdade.
+5. O resistor passa o nível para o LED. O LED acende com anodo = 1 e catodo = 0; sem resistor, queima.
 
 ---
 
@@ -28,68 +42,71 @@ modo_livre.gd -> Global.calcular_porta(porta, a, b) -> bancada.mostrar_saida(s) 
 
 | Conceito | Onde aparece | Exemplo |
 |---|---|---|
-| **Variáveis** | todos os scripts | `var porta_atual: String = "AND"` (modo_livre.gd) |
-| **Tipos de dados** | | `bool` (a, b, ligada), `int` (pontos, rodada), `float` (tempo), `String` (porta), `Array` (PORTAS), `Dictionary` (EXPRESSOES, testes), `Color`, `Vector3` |
-| **Constantes** | global.gd, desafio.gd | `const PONTOS_ACERTO: int = 100` |
-| **Condicional `if/elif/else`** | resultado.gd → `escolher_mensagem()` | escolhe a mensagem pelo nº de acertos |
-| **Condicional `match`** | global.gd → `calcular_porta()` | um caso para cada porta lógica |
-| **Laço `for`** | modo_livre.gd → `montar_tabela()`; chip.gd → `criar_pinos()` | dois `for` um dentro do outro geram as 4 combinações 00, 01, 10, 11 |
-| **Funções** | todos | `func calcular_porta(porta: String, a: bool, b: bool) -> bool` recebe parâmetros e **retorna** um valor |
-| **Sinais (eventos)** | chave.gd (`signal alternada`), bancada.gd (`signal entradas_mudaram`), botões (`pressed`) | `.connect(funcao)` liga o sinal a uma função; `.emit()` dispara o sinal |
-| **Nós** | todas as cenas | `Area3D`, `MeshInstance3D`, `Label3D`, `Camera3D`, `OmniLight3D`, `Button`, `Label`, `GridContainer`... |
-| **Cenas** | pasta `cenas/` | cenas pequenas (chave, LED, chip) são **instanciadas** dentro de cenas maiores (bancada) |
-| **Interação com o usuário** | chave.gd (`input_event`), camera_orbita.gd (`_unhandled_input`), botões | clique, teclado (A, B, Esc), mouse (girar/zoom) |
-| **Troca de cena** | menu.gd e outros | `get_tree().change_scene_to_file("res://cenas/desafio.tscn")` |
-| **Sorteio** | desafio.gd → `iniciar_rodada()` | `PORTAS_DESAFIO.pick_random()` |
-| **Salvar dados em arquivo** | global.gd → `verificar_recorde()` | `FileAccess.open(...)` grava o recorde |
-| **Animação** | chave.gd → `atualizar_visual()` | `create_tween()` gira a alavanca |
-| **`_ready()` e `_process(delta)`** | menu.gd, desafio.gd | `_ready` roda 1 vez no início; `_process` roda a cada quadro (cronômetro, giro) |
+| **Variáveis e tipos** | todos os scripts | `bool` (ligada), `int` (pontos), `float` (tempo), `String` (porta), `Array` (fios), `Dictionary` (PORTAS_DO_CI), `Vector2i` (furo), `Vector3`, `Color` |
+| **Constantes** | global.gd, monte_circuito.gd | `const PINO_VCC: int = 14`, `const NIVEIS` |
+| **`if/elif/else`** | circuito.gd → `simular()` (LED) | aceso, queimado ou piscando |
+| **`match`** | global.gd → `calcular_porta()`; encontre_erro.gd → `aplicar_defeito()` | um caso para cada porta / cada erro |
+| **Laço `for`** | protoboard_3d.gd → `criar_furos()`; monte_circuito.gd → `testar_circuito()` | 420 furos; todas as combinações das chaves (`1 << n` = 2ⁿ) |
+| **Laço `while`** | circuito.gd → `simular()` | repete até nenhuma porta mudar |
+| **Funções com retorno** | `calcular_porta()`, `furo_do_pino()`, `simular()` | recebem parâmetros e **retornam** um valor |
+| **Classe própria** | circuito.gd (`class_name Circuito`) | `Circuito.new()`, `Circuito.montagem_correta("AND")` |
+| **Sinais** | protoboard_3d.gd (`chave_alternada`, `furo_clicado`), botões (`pressed`) | `.connect()` liga; `.emit()` dispara |
+| **Cenas reaproveitadas** | `protoboard.tscn` instanciada em 4 cenas | |
+| **Interação** | `Area3D.input_event` (chaves e furos), teclado (A, B, C, Esc), mouse (girar/zoom) | |
+| **Desenho 2D** | diagrama_ci.gd → `_draw()` | pinagem desenhada com `draw_rect`, `draw_line`, `draw_string` |
+| **Troca de cena** | menu.gd → `trocar_cena()` | `get_tree().change_scene_to_file(...)` |
+| **Sorteio** | desafio.gd, encontre_erro.gd | `pick_random()`, `randf()` |
+| **Salvar dados** | global.gd → `salvar_dados()` / `carregar_dados()` | arquivo JSON com recordes e nível liberado |
+| **Tratamento de erros** | global.gd (arquivo estragado ou que não abre), monte_circuito.gd (furo ocupado) | o jogo avisa e continua |
+| **Testes** | monte_circuito.gd → `testar_circuito()` | testa todas as combinações e compara com o pedido |
 
 ---
 
 ## 3. As funções mais importantes (expliquem com suas palavras)
 
 ### `Global.calcular_porta(porta, a, b)` – global.gd
-Recebe o nome da porta e as duas entradas (`true` = 1, `false` = 0) e devolve a saída.
-- AND → `a and b` (só é 1 se as duas forem 1)
-- OR → `a or b`
-- NOT → `not a`
-- NAND → `not (a and b)`
-- NOR → `not (a or b)`
-- XOR → `a != b` (1 quando são **diferentes**)
-- XNOR → `a == b` (1 quando são **iguais**)
+Recebe o nome da porta e as duas entradas (`true` = 1) e devolve a saída. AND → `a and b`,
+OR → `a or b`, NOT → `not a`, NAND → `not (a and b)`, NOR → `not (a or b)`, XOR → `a != b`,
+XNOR → `a == b`.
 
-### `montar_tabela()` – modo_livre.gd
-Apaga as células antigas, cria o cabeçalho e usa **dois `for`** (A = 0/1 e B = 0/1) para gerar as
-4 linhas. Para cada linha, calcula S e, se a linha for igual às chaves atuais, pinta de laranja.
+### `Global.PORTAS_DO_CI` – global.gd
+A pinagem: para cada CI, a lista das portas, cada uma com `[entrada, entrada, saída]`.
+O 74HC02 é diferente: `[2, 3, 1]` (a saída é o pino 1).
 
-### `iniciar_rodada()` e `_on_resposta()` – desafio.gd
-- `iniciar_rodada()` sorteia a porta secreta, zera os testes e desliga as chaves.
-- `registrar_teste()` guarda cada combinação testada no **dicionário** `testes` (ex.: `"01": true`).
-- `_on_resposta()` compara a resposta com a porta secreta (`if porta_escolhida == porta_secreta`),
-  soma pontos (+100 e +50 de bônus se o tempo for ≤ 20 s) e mostra a janela de resultado da rodada.
+### `Circuito.furo_do_pino(ci, pino)` – circuito.gd
+Diz em que furo da protoboard está cada pino. Pinos 1–7 embaixo, 8–14 em cima. Se o CI estiver
+virado (`girado`), o pino 1 vai para o lugar do 8.
 
-### `alternar()` – chave.gd
-Inverte o estado (`ligada = not ligada`), atualiza a aparência e **emite o sinal** `alternada`.
+### `Circuito.montagem_correta(porta)` – circuito.gd
+Monta a protoboard certa de uma porta: CI, chaves, resistor, LED e fios. Os pinos das entradas e da
+saída vêm da tabela de pinagem.
+
+### `aplicar_defeito()` – encontre_erro.gd
+Pega a montagem certa e estraga **uma** coisa (tira um fio, inverte o LED, vira o CI...).
+Retorna o furo do erro, que é marcado depois da resposta.
+
+### `testar_circuito()` – monte_circuito.gd
+Liga as chaves em todas as combinações, chama `simular()` e compara o LED com `saida_esperada()`.
 
 ---
 
 ## 4. Perguntas prováveis da banca (e respostas curtas)
 
-- **O que é um sinal?** Um aviso que um nó manda quando algo acontece (ex.: botão clicado). Outros
-  scripts "se conectam" ao sinal para executar uma função quando ele acontece.
-- **Por que a bancada é uma cena separada?** Para reaproveitar: o Modo Livre e o Desafio usam a
-  mesma bancada, sem copiar código.
-- **O que é o Global/Autoload?** Um script que fica sempre carregado; serve para guardar dados entre
-  cenas (pontos, acertos) e funções usadas em vários lugares.
-- **Como o clique na chave 3D funciona?** A chave é um `Area3D` com uma `CollisionShape3D`. O Godot
-  detecta o mouse sobre a forma e dispara o sinal `input_event`; verificamos se foi botão esquerdo.
-- **O que faz o `@onready`?** Pega a referência de um nó filho quando a cena fica pronta.
-- **O que é `delta`?** O tempo (em segundos) que passou desde o último quadro. Somando `delta` a cada
-  quadro temos um cronômetro.
-- **Por que a NOT não aparece no Desafio?** Ela só tem uma entrada, então a chave B não teria efeito.
-- **Qual a relação com Eletrônica Digital?** Portas lógicas, níveis lógicos 0/1, tabelas-verdade,
-  expressões booleanas, CIs 74xx e o método de descobrir a função de um circuito testando entradas.
+- **O que é um sinal?** Um aviso que um nó manda quando algo acontece. Outros scripts se conectam a
+  ele para executar uma função.
+- **Por que separar `circuito.gd` e `protoboard_3d.gd`?** Um calcula (a parte elétrica), o outro
+  desenha. Assim o "Monte o circuito" pode testar as combinações sem redesenhar nada.
+- **Como o jogo sabe quais furos estão ligados?** Pelo nome do nó (`no_do_furo()`): furos da mesma
+  coluna de 5 têm o mesmo nome; os fios juntam nós diferentes.
+- **Como o clique no furo funciona?** Uma `Area3D` do tamanho da placa recebe o clique; a função
+  `furo_mais_perto()` converte a posição 3D no furo.
+- **Por que o LED pisca quando falta o fio da chave?** Num CI 74HC uma entrada solta fica
+  indefinida; o jogo representa isso com o valor "instável".
+- **O que é o Global/Autoload?** Um script sempre carregado, que guarda dados entre cenas.
+- **O que é `delta`?** O tempo desde o último quadro. Somando `delta` temos um cronômetro.
+- **Qual a relação com Eletrônica Digital?** Portas lógicas, tabelas-verdade, expressões booleanas,
+  pinagem dos CIs 74HC, alimentação (VCC/GND), protoboard, resistor do LED, montagem de circuitos
+  com várias portas (XOR com NAND, meio-somador) e análise de defeitos.
 
 ---
 
@@ -97,15 +114,16 @@ Inverte o estado (`ligada = not ligada`), atualiza a aparência e **emite o sina
 
 | Pedido | O que mudar |
 |---|---|
-| "Mude o número de rodadas para 3" | `global.gd`: `var total_rodadas: int = 3` |
-| "Dê 200 pontos por acerto" | `desafio.gd`: `const PONTOS_ACERTO: int = 200` |
+| "Mude o número de rodadas para 3" | `desafio.gd`: `const TOTAL_RODADAS: int = 3` |
+| "Dê 200 pontos por acerto" | `desafio.gd` ou `encontre_erro.gd`: `PONTOS_ACERTO` |
 | "Mude o tempo do bônus" | `desafio.gd`: `const TEMPO_BONUS: float = 30.0` |
-| "Coloque a NOT no desafio" | `desafio.gd`: adicionar `"NOT"` em `PORTAS_DESAFIO` |
-| "LED verde em vez de vermelho" | `led.gd`: mudar `COR_ACESO`; e `led.tscn` → nó `Luz` → `light_color` |
-| "Fio ligado de outra cor" | `bancada.gd`: `COR_FIO_LIGADO` |
-| "Câmera gira mais rápido" | Inspetor do nó `PivoCamera` → `Sensibilidade` (ou `camera_orbita.gd`) |
-| "Troque a tecla da chave A para 1" | `bancada.gd` → `_unhandled_input`: `KEY_A` → `KEY_1` |
-| "Mensagem diferente para 5 acertos" | `resultado.gd` → `escolher_mensagem()` |
-| "O LED pisca mais rápido no menu" | `menu.gd`: `INTERVALO_PISCA` |
+| "Mais montagens sem erro" | `encontre_erro.gd`: `CHANCE_SEM_ERRO = 0.5` |
+| "Fio de sinal de outra cor" | `protoboard_3d.gd`: `CORES_FIO["sinal"]` |
+| "LED verde" | `protoboard_3d.gd`: `COR_LED_ACESO` |
+| "Coloque o CI em outra coluna" | `circuito.gd` → `montagem_correta()`: `adicionar_ci(modelo, 10)` (mudar também os fios) |
+| "Crie um nível 6" | `monte_circuito.gd`: novo item em `NIVEIS` e um `6:` em `saida_esperada()`; em `global.gd`, `clampi(..., 1, 6)` |
+| "Câmera gira mais rápido" | Inspetor do nó `PivoCamera` → `Sensibilidade` |
+| "Troque a tecla da chave A para 1" | `protoboard_3d.gd` → `_unhandled_input`: `KEY_A` → `KEY_1` |
+| "Mensagem diferente para 100% de acertos" | `resultado.gd` → `escolher_mensagem()` |
 
 Dica: depois de mudar, salvem (Ctrl+S) e rodem com F5 para mostrar que funcionou.

@@ -1,5 +1,5 @@
 # camera_orbita.gd
-# Permite girar a câmera em volta da bancada.
+# Permite girar a câmera em volta da protoboard.
 # Botão direito do mouse + arrastar = girar. Roda do mouse = aproximar/afastar.
 extends Node3D
 

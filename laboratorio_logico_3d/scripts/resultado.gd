@@ -1,5 +1,6 @@
 # resultado.gd
-# Tela final do Modo Desafio: mostra acertos, pontos, tempo e uma mensagem.
+# Tela final dos desafios ("Descubra a porta" e "Encontre o erro"):
+# mostra acertos, pontos, tempo, uma mensagem e o recorde daquele modo.
 extends Control
 
 @onready var label_acertos: Label = $Painel/Coluna/LabelAcertos
@@ -21,23 +22,26 @@ func _ready() -> void:
 	if Global.verificar_recorde():
 		label_recorde.text = "Novo recorde!"
 	else:
-		label_recorde.text = "Recorde atual: %d pontos" % Global.recorde
+		label_recorde.text = "Recorde atual: %d pontos" % Global.recordes[Global.modo_atual]
 
 
 # Escolhe uma mensagem de acordo com o número de acertos.
 func escolher_mensagem(acertos: int) -> String:
-	if acertos == Global.total_rodadas:
+	# Porcentagem de acertos (float para não perder as casas decimais).
+	var taxa: float = float(acertos) / Global.total_rodadas
+	if taxa == 1.0:
 		return "Excelente! Você domina as portas lógicas!"
-	elif acertos >= 3:
-		return "Muito bem! Revise as tabelas-verdade das portas que errou."
-	elif acertos >= 1:
-		return "Bom começo! Treine mais no Modo Livre."
+	elif taxa >= 0.6:
+		return "Muito bem! Revise o que errou na tela Aprender."
+	elif taxa > 0.0:
+		return "Bom começo! Treine mais no Modo Livre e na tela Aprender."
 	else:
-		return "Não desanime! Use o Modo Livre e a tela de teoria para estudar."
+		return "Não desanime! Use o Modo Livre e a tela Aprender para estudar."
 
 
 func _on_botao_novamente_pressed() -> void:
-	get_tree().change_scene_to_file("res://cenas/desafio.tscn")
+	# Volta para o mesmo modo que acabou de ser jogado.
+	get_tree().change_scene_to_file(Global.CENAS_DOS_MODOS[Global.modo_atual])
 
 
 func _on_botao_menu_pressed() -> void:

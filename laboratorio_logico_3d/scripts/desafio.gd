@@ -2,10 +2,12 @@
 # MODO DESAFIO (jogo): o CI mostra "?" e esconde uma porta lógica sorteada.
 # O jogador testa as chaves, observa o LED e tenta descobrir qual é a porta.
 # São várias rodadas; no final o jogo vai para a tela de resultado.
+# Dica para quem conhece a pinagem: o 74HC02 (NOR) é ligado diferente dos outros!
 extends Node
 
 # Portas que podem ser sorteadas (a NOT fica de fora porque tem só uma entrada).
 const PORTAS_DESAFIO: Array[String] = ["AND", "OR", "NAND", "NOR", "XOR", "XNOR"]
+const TOTAL_RODADAS: int = 5
 const PONTOS_ACERTO: int = 100
 const PONTOS_BONUS: int = 50 # bônus para quem acerta rápido
 const TEMPO_BONUS: float = 20.0 # segundos
@@ -18,7 +20,7 @@ var rodada_ativa: bool = false
 var testes: Dictionary = {}
 var botoes_resposta: Array[Button] = []
 
-@onready var bancada = $Bancada
+@onready var protoboard = $Protoboard
 @onready var label_rodada: Label = $Interface/Tela/PainelPlacar/Coluna/LabelRodada
 @onready var label_pontos: Label = $Interface/Tela/PainelPlacar/Coluna/LabelPontos
 @onready var label_tempo: Label = $Interface/Tela/PainelPlacar/Coluna/LabelTempo
@@ -32,9 +34,9 @@ var botoes_resposta: Array[Button] = []
 
 
 func _ready() -> void:
-	Global.reiniciar_desafio()
+	Global.reiniciar_partida("descubra", TOTAL_RODADAS)
 	criar_botoes_resposta()
-	bancada.entradas_mudaram.connect(_on_entradas_mudaram)
+	protoboard.chave_alternada.connect(_on_chave_alternada)
 	botao_proxima.pressed.connect(_on_botao_proxima_pressed)
 	botao_voltar.pressed.connect(voltar_ao_menu)
 	iniciar_rodada()
@@ -67,23 +69,25 @@ func iniciar_rodada() -> void:
 	painel_feedback.visible = false
 	habilitar_respostas(true)
 
-	bancada.mostrar_porta("?", "74??")
-	bancada.reiniciar_chaves()
+	# Monta a porta secreta na protoboard, mas esconde o nome do CI.
+	protoboard.carregar(Circuito.montagem_correta(porta_secreta))
+	protoboard.definir_texto_ci(0, "74HC??")
 	label_rodada.text = "Rodada %d de %d" % [rodada, Global.total_rodadas]
 	label_pontos.text = "Pontos: %d" % Global.pontos
 	registrar_teste() # registra a combinação inicial A=0, B=0
 
 
-func _on_entradas_mudaram(_a: bool, _b: bool) -> void:
+func _on_chave_alternada(_nome: String, _ligada: bool) -> void:
 	registrar_teste()
 
 
-# Calcula a saída da porta secreta, acende o LED e anota o teste.
+# Lê o LED da protoboard e anota o teste.
 func registrar_teste() -> void:
-	var a: bool = bancada.a
-	var b: bool = bancada.b
-	var s: bool = Global.calcular_porta(porta_secreta, a, b)
-	bancada.mostrar_saida(s)
+	if not rodada_ativa:
+		return
+	var a: bool = protoboard.valor_chave("A")
+	var b: bool = protoboard.valor_chave("B")
+	var s: bool = protoboard.resultado["leds"][0] == "aceso"
 	testes[Global.bit(a) + Global.bit(b)] = s
 	atualizar_tabela_testes()
 
@@ -129,7 +133,7 @@ func _on_resposta(porta_escolhida: String) -> void:
 	habilitar_respostas(false)
 
 	# Revela a porta que estava escondida no CI.
-	bancada.mostrar_porta(porta_secreta, Global.CIS[porta_secreta])
+	protoboard.definir_texto_ci(0, Global.CIS[porta_secreta])
 
 	if porta_escolhida == porta_secreta:
 		var ganhos: int = PONTOS_ACERTO

@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/protoboard_3d.gd" id="1_protoboard"]
+[ext_resource type="Script" path="res://scripts/camera_orbita.gd" id="2_camera"]
+
+[sub_resource type="Environment" id="ambiente"]
+background_mode = 1
+background_color = Color(0.1, 0.12, 0.17, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.75, 0.8, 0.9, 1)
+ambient_light_energy = 0.55
+
+[node name="Protoboard" type="Node3D"]
+script = ExtResource("1_protoboard")
+
+[node name="Ambiente" type="WorldEnvironment" parent="."]
+environment = SubResource("ambiente")
+
+[node name="Sol" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.9, 0.5, 0)
+shadow_enabled = true
+
+[node name="PivoCamera" type="Node3D" parent="."]
+position = Vector3(0, 0, -0.35)
+rotation = Vector3(-1.0, 0, 0)
+script = ExtResource("2_camera")
+zoom_minimo = 2.0
+
+[node name="Camera3D" type="Camera3D" parent="PivoCamera"]
+position = Vector3(0, 0, 3.8)
+fov = 60.0
+current = true

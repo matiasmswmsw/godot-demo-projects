@@ -15,12 +15,15 @@ var tempo_pisca: float = 0.0
 
 func _ready() -> void:
 	# Conectando o sinal "pressed" de cada botão a uma função.
+	$Interface/Tela/Coluna/BotaoAprender.pressed.connect(trocar_cena.bind("res://cenas/aprender.tscn"))
 	$Interface/Tela/Coluna/BotaoLivre.pressed.connect(_on_botao_livre_pressed)
-	$Interface/Tela/Coluna/BotaoDesafio.pressed.connect(_on_botao_desafio_pressed)
-	$Interface/Tela/Coluna/BotaoComoJogar.pressed.connect(_on_botao_como_jogar_pressed)
+	$Interface/Tela/Coluna/BotaoDesafio.pressed.connect(trocar_cena.bind("res://cenas/desafio.tscn"))
+	$Interface/Tela/Coluna/BotaoErro.pressed.connect(trocar_cena.bind("res://cenas/encontre_erro.tscn"))
+	$Interface/Tela/Coluna/BotaoMontar.pressed.connect(trocar_cena.bind("res://cenas/monte_circuito.tscn"))
 	$Interface/Tela/Coluna/BotaoSair.pressed.connect(_on_botao_sair_pressed)
-	chip.definir_texto("7408\nAND")
-	label_recorde.text = "Recorde: %d pontos" % Global.recorde
+	chip.definir_texto("74HC08\nAND")
+	label_recorde.text = "Recordes: Descubra a porta %d • Encontre o erro %d • Nível liberado: %d" % [
+		Global.recordes["descubra"], Global.recordes["erro"], Global.nivel_liberado]
 
 
 func _process(delta: float) -> void:
@@ -33,16 +36,13 @@ func _process(delta: float) -> void:
 		led.acender(not led.aceso)
 
 
+func trocar_cena(caminho: String) -> void:
+	get_tree().change_scene_to_file(caminho)
+
+
 func _on_botao_livre_pressed() -> void:
+	Global.porta_inicial = "AND"
 	get_tree().change_scene_to_file("res://cenas/modo_livre.tscn")
-
-
-func _on_botao_desafio_pressed() -> void:
-	get_tree().change_scene_to_file("res://cenas/desafio.tscn")
-
-
-func _on_botao_como_jogar_pressed() -> void:
-	get_tree().change_scene_to_file("res://cenas/como_jogar.tscn")
 
 
 func _on_botao_sair_pressed() -> void:

@@ -3,8 +3,18 @@
 Trabalho final de **Linguagem de Programação** (Godot), integrado com **Eletrônica Digital**.
 Matias Scheid Warken e Lucas Ritter – 2º ano, Técnico em Automação Industrial, IFSul Lajeado.
 
-Jogo/simulador 3D em que o usuário liga e desliga chaves (entradas A e B) numa bancada de
-eletrônica e vê o LED (saída S) acender de acordo com a porta lógica do CI.
+Jogo/simulador 3D de portas lógicas montadas numa **protoboard**, com CIs da linha **74HC**
+(pinagem real, VCC e GND), chaves de 3 pernas, resistor de 330 Ω e LED.
+
+## Modos
+
+| Modo | O que faz |
+|---|---|
+| **Aprender** | Pinagem desenhada dos 7 CIs, teoria, tabela-verdade e como ligar na protoboard |
+| **Modo Livre** | Protoboard montada certa; o usuário liga as chaves e vê o LED e a tabela-verdade |
+| **Descubra a porta** | O CI aparece como "74HC??"; testar as combinações e descobrir a porta (5 rodadas) |
+| **Encontre o erro** | Montagem com um erro de ligação (ou nenhum); escolher a causa na lista (6 montagens) |
+| **Monte o circuito** | CIs e LED fixos; o jogador liga os fios. 5 níveis, de uma AND até o meio-somador |
 
 ## Como abrir
 
@@ -18,7 +28,8 @@ Se o Godot perguntar se quer converter o projeto para a versão nova, pode aceit
 
 | Ação | Como fazer |
 |---|---|
-| Ligar/desligar chave | Clique esquerdo na chave, ou teclas **A** e **B** |
+| Ligar/desligar chave | Clique esquerdo na chave, ou teclas **A**, **B** e **C** |
+| Ligar um fio (Monte o circuito) | Clique num furo livre e depois em outro |
 | Girar a câmera | Botão direito do mouse + arrastar |
 | Zoom | Roda do mouse |
 | Voltar ao menu | **Esc** |
@@ -29,18 +40,23 @@ Se o Godot perguntar se quer converter o projeto para a versão nova, pode aceit
 laboratorio_logico_3d/
 ├── project.godot        configuração do projeto (cena inicial, autoload, tela)
 ├── tema.tres            visual dos botões e painéis
-├── cenas/               cenas (.tscn)
+├── cenas/
 │   ├── menu.tscn            tela inicial (3D + botões)
+│   ├── aprender.tscn        pinagem, teoria e "como jogar"
 │   ├── modo_livre.tscn      simulador
-│   ├── desafio.tscn         jogo do CI misterioso
-│   ├── resultado.tscn       tela final do desafio
-│   ├── como_jogar.tscn      instruções e teoria
-│   ├── bancada.tscn         bancada 3D (reutilizada no Modo Livre e no Desafio)
-│   ├── chave.tscn           chave/interruptor 3D clicável
-│   ├── chip.tscn            CI DIP de 14 pinos
-│   └── led.tscn             LED
-├── scripts/             um script .gd para cada cena + global.gd
-└── docs/                textos de apoio para as etapas do trabalho
+│   ├── desafio.tscn         "Descubra a porta"
+│   ├── encontre_erro.tscn   "Encontre o erro"
+│   ├── monte_circuito.tscn  "Monte o circuito" (níveis)
+│   ├── resultado.tscn       tela final dos desafios
+│   ├── protoboard.tscn      protoboard 3D (reutilizada em 4 cenas)
+│   ├── chip.tscn, led.tscn  peças da vitrine do menu
+├── scripts/
+│   ├── global.gd            Autoload: pinagem, calcular_porta(), recordes, salvar/carregar
+│   ├── circuito.gd          "cérebro elétrico": peças, fios e simular()
+│   ├── protoboard_3d.gd     desenha o circuito em 3D e recebe os cliques
+│   ├── diagrama_ci.gd       desenha a pinagem em 2D
+│   └── um script para cada cena
+└── docs/
     ├── ETAPA1_PROPOSTA.md
     ├── ETAPA2_ROTEIRO_TELAS.md
     └── GUIA_DO_CODIGO.md    estudem este antes da apresentação!
