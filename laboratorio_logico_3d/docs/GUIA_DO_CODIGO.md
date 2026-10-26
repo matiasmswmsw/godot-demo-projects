@@ -53,6 +53,8 @@ pequena alteração**. Este guia mostra onde está cada conceito no projeto. Lei
 | **Sinais** | protoboard_3d.gd (`chave_alternada`, `furo_clicado`), botões (`pressed`) | `.connect()` liga; `.emit()` dispara |
 | **Cenas reaproveitadas** | `protoboard.tscn` instanciada em 4 cenas | |
 | **Interação** | `Area3D.input_event` (chaves e furos), teclado (A, B, C, Esc), mouse (girar/zoom) | |
+| **Grupos** | painel_retratil.gd (`add_to_group`), protoboard_3d.gd (`call_group`) | um botão recolhe todos os painéis de uma vez |
+| **Interpolação (suavizar)** | camera_orbita.gd → `_process()` | `lerpf`, `lerp_angle`: a câmera anda aos poucos até o alvo |
 | **Desenho 2D** | diagrama_ci.gd → `_draw()` | pinagem desenhada com `draw_rect`, `draw_line`, `draw_string` |
 | **Troca de cena** | menu.gd → `trocar_cena()` | `get_tree().change_scene_to_file(...)` |
 | **Sorteio** | desafio.gd, encontre_erro.gd | `pick_random()`, `randf()` |
@@ -122,7 +124,10 @@ Liga as chaves em todas as combinações, chama `simular()` e compara o LED com 
 | "LED verde" | `protoboard_3d.gd`: `COR_LED_ACESO` |
 | "Coloque o CI em outra coluna" | `circuito.gd` → `montagem_correta()`: `adicionar_ci(modelo, 10)` (mudar também os fios) |
 | "Crie um nível 6" | `monte_circuito.gd`: novo item em `NIVEIS` e um `6:` em `saida_esperada()`; em `global.gd`, `clampi(..., 1, 6)` |
-| "Câmera gira mais rápido" | Inspetor do nó `PivoCamera` → `Sensibilidade` |
+| "Câmera gira mais rápido" | Inspetor do nó `PivoCamera` (cena protoboard) → `Sensibilidade` |
+| "Câmera mais lenta/suave" | `PivoCamera` → `Suavidade` (menor = mais suave) |
+| "Mude o texto do visor da fonte" | `protoboard_3d.gd` → `criar_fonte()`: `"5.00 V"` |
+| "Recolher os painéis com outra tecla" | `protoboard_3d.gd` → `_unhandled_input`: `KEY_H` |
 | "Troque a tecla da chave A para 1" | `protoboard_3d.gd` → `_unhandled_input`: `KEY_A` → `KEY_1` |
 | "Mensagem diferente para 100% de acertos" | `resultado.gd` → `escolher_mensagem()` |
 

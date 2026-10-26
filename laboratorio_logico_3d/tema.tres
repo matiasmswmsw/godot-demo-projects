@@ -70,6 +70,8 @@ corner_radius_bottom_left = 10
 
 [resource]
 default_font_size = 20
+Label/colors/font_outline_color = Color(0, 0, 0, 0.75)
+Label/constants/outline_size = 4
 Button/colors/font_pressed_color = Color(0.1, 0.08, 0.02, 1)
 Button/colors/font_hover_pressed_color = Color(0.1, 0.08, 0.02, 1)
 Button/styles/normal = SubResource("botao_normal")

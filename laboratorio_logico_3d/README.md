@@ -30,8 +30,11 @@ Se o Godot perguntar se quer converter o projeto para a versão nova, pode aceit
 |---|---|
 | Ligar/desligar chave | Clique esquerdo na chave, ou teclas **A**, **B** e **C** |
 | Ligar um fio (Monte o circuito) | Clique num furo livre e depois em outro |
-| Girar a câmera | Botão direito do mouse + arrastar |
-| Zoom | Roda do mouse |
+| Girar a câmera | Botão direito do mouse + arrastar, ou setas |
+| Mover a câmera | Botão do meio (ou Shift + botão direito) + arrastar, ou Shift + setas |
+| Zoom | Roda do mouse, ou teclas + e − |
+| Vistas prontas | 1 = inclinada • 2 = de cima • 3 = de frente (ou os botões no alto) |
+| Recolher/abrir os painéis | Tecla **H**, botão "Painéis", ou clicar no título de cada painel |
 | Voltar ao menu | **Esc** |
 
 ## Organização

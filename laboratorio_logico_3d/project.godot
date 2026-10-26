@@ -20,6 +20,7 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/size/mode=2
 
 [gui]
 
@@ -29,3 +30,6 @@ theme/custom="res://tema.tres"
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+anti_aliasing/quality/msaa_3d=2
+anti_aliasing/quality/msaa_2d=1
+textures/default_filters/anisotropic_filtering_level=2

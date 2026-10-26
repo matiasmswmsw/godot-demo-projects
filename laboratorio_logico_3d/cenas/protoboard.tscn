@@ -3,12 +3,24 @@
 [ext_resource type="Script" path="res://scripts/protoboard_3d.gd" id="1_protoboard"]
 [ext_resource type="Script" path="res://scripts/camera_orbita.gd" id="2_camera"]
 
+[sub_resource type="ProceduralSkyMaterial" id="ceu_material"]
+sky_top_color = Color(0.3, 0.45, 0.65, 1)
+sky_horizon_color = Color(0.75, 0.8, 0.87, 1)
+ground_bottom_color = Color(0.22, 0.23, 0.26, 1)
+ground_horizon_color = Color(0.75, 0.8, 0.87, 1)
+
+[sub_resource type="Sky" id="ceu"]
+sky_material = SubResource("ceu_material")
+
 [sub_resource type="Environment" id="ambiente"]
-background_mode = 1
-background_color = Color(0.1, 0.12, 0.17, 1)
-ambient_light_source = 2
-ambient_light_color = Color(0.75, 0.8, 0.9, 1)
-ambient_light_energy = 0.55
+background_mode = 2
+sky = SubResource("ceu")
+ambient_light_source = 3
+ambient_light_energy = 0.7
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.5
+glow_bloom = 0.05
 
 [node name="Protoboard" type="Node3D"]
 script = ExtResource("1_protoboard")
@@ -20,11 +32,15 @@ environment = SubResource("ambiente")
 rotation = Vector3(-0.9, 0.5, 0)
 shadow_enabled = true
 
+[node name="LuzDePreenchimento" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.6, -2.4, 0)
+light_energy = 0.35
+
 [node name="PivoCamera" type="Node3D" parent="."]
 position = Vector3(0, 0, -0.35)
 rotation = Vector3(-1.0, 0, 0)
 script = ExtResource("2_camera")
-zoom_minimo = 2.0
+zoom_minimo = 1.2
 
 [node name="Camera3D" type="Camera3D" parent="PivoCamera"]
 position = Vector3(0, 0, 3.8)

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/modo_livre.gd" id="1_livre"]
 [ext_resource type="PackedScene" path="res://cenas/protoboard.tscn" id="2_protoboard"]
+[ext_resource type="Script" path="res://scripts/painel_retratil.gd" id="9_retratil"]
 
 [node name="ModoLivre" type="Node"]
 script = ExtResource("1_livre")
@@ -25,6 +26,8 @@ offset_left = 16.0
 offset_top = 16.0
 offset_right = 16.0
 offset_bottom = 16.0
+script = ExtResource("9_retratil")
+titulo = "Portas"
 
 [node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelPortas"]
 layout_mode = 2
@@ -49,6 +52,8 @@ offset_top = 16.0
 offset_right = -16.0
 offset_bottom = 16.0
 grow_horizontal = 0
+script = ExtResource("9_retratil")
+titulo = "Informações"
 
 [node name="Coluna" type="VBoxContainer" parent="Interface/Tela/PainelInfo"]
 layout_mode = 2

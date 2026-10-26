@@ -38,6 +38,7 @@ var visuais_ci: Array[Dictionary] = []
 var visuais_led: Array[Dictionary] = []
 var visuais_chave: Array[Dictionary] = []
 var tempo: float = 0.0
+var paineis_recolhidos: bool = false
 
 
 func _ready() -> void:
@@ -53,6 +54,7 @@ func _ready() -> void:
 	marcador_inicio.visible = false
 	conteudo = Node3D.new()
 	add_child(conteudo)
+	criar_barra_camera()
 
 
 func _process(delta: float) -> void:
@@ -67,10 +69,12 @@ func _process(delta: float) -> void:
 		marca.visible = int(tempo * 3.0) % 2 == 0
 
 
-# Atalhos de teclado: A, B e C ligam e desligam as chaves.
+# Atalhos de teclado: A, B e C ligam e desligam as chaves; H recolhe os painéis.
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_A:
+		if event.keycode == KEY_H:
+			alternar_paineis()
+		elif event.keycode == KEY_A:
 			alternar_chave("A")
 		elif event.keycode == KEY_B:
 			alternar_chave("B")
@@ -227,8 +231,99 @@ func criar_placa() -> void:
 		criar_caixa(self, Vector3(0, 0.002, z), Vector3(largura, 0.004, 0.015), Color(0.85, 0.1, 0.1))
 	for z in [-0.81, 1.07]:
 		criar_caixa(self, Vector3(0, 0.002, z), Vector3(largura, 0.004, 0.015), Color(0.1, 0.25, 0.85))
-	# Mesa embaixo de tudo
-	criar_caixa(self, Vector3(0, -0.2, 0), Vector3(6.0, 0.2, 3.6), Color(0.42, 0.29, 0.18))
+	criar_laboratorio()
+
+
+# O "cenário": bancada, manta antiestática, parede, fonte de 5 V e caixa de peças.
+func criar_laboratorio() -> void:
+	# Bancada cinza-clara com borda escura
+	criar_caixa(self, Vector3(0, -0.16, 0.4), Vector3(9.0, 0.12, 5.4), Color(0.74, 0.76, 0.78))
+	criar_caixa(self, Vector3(0, -0.16, 3.12), Vector3(9.0, 0.14, 0.06), Color(0.22, 0.24, 0.28))
+	# Manta antiestática azul (usada em laboratório para não estragar os CIs)
+	criar_caixa(self, Vector3(0, -0.097, 0), Vector3(5.0, 0.008, 3.0), Color(0.14, 0.34, 0.5))
+	# Chão e parede do fundo
+	criar_caixa(self, Vector3(0, -1.2, 0), Vector3(40, 0.1, 40), Color(0.36, 0.38, 0.42))
+	criar_caixa(self, Vector3(0, 0.9, -3.1), Vector3(16, 4.0, 0.1), Color(0.82, 0.86, 0.9))
+	criar_caixa(self, Vector3(0, 0.25, -3.04), Vector3(16, 0.08, 0.02), Color(0.14, 0.34, 0.5))
+	var placa := criar_texto(self, "LABORATÓRIO DE ELETRÔNICA DIGITAL", 120, Color(0.14, 0.3, 0.45))
+	placa.rotation = Vector3.ZERO # em pé, na parede
+	placa.position = Vector3(0, 1.3, -3.03)
+	criar_fonte()
+	criar_caixa_de_pecas()
+
+
+# Fonte de bancada de 5 V, com cabos até as trilhas da protoboard.
+func criar_fonte() -> void:
+	var base := Vector3(-3.0, -0.1, -1.2)
+	criar_caixa(self, base + Vector3(0, 0.27, 0), Vector3(1.0, 0.54, 0.7), Color(0.86, 0.87, 0.89))
+	criar_caixa(self, base + Vector3(-0.15, 0.36, 0.351), Vector3(0.5, 0.17, 0.01), Color(0.04, 0.08, 0.06))
+	var visor := criar_texto(self, "5.00 V", 110, Color(0.3, 1.0, 0.45))
+	visor.rotation = Vector3.ZERO
+	visor.position = base + Vector3(-0.15, 0.36, 0.36)
+	var nome := criar_texto(self, "FONTE DC", 48, Color(0.2, 0.22, 0.25))
+	nome.rotation = Vector3.ZERO
+	nome.outline_size = 0
+	nome.position = base + Vector3(-0.15, 0.49, 0.36)
+	# Botões giratórios e bornes (+ vermelho, − preto)
+	var frente: float = base.z + 0.35
+	criar_segmento(self, Vector3(base.x + 0.3, base.y + 0.38, frente), Vector3(base.x + 0.3, base.y + 0.38, frente + 0.05), 0.05, criar_material(Color(0.15, 0.15, 0.17)))
+	var mais := Vector3(base.x + 0.18, base.y + 0.12, frente)
+	var menos := Vector3(base.x + 0.38, base.y + 0.12, frente)
+	criar_segmento(self, mais, mais + Vector3(0, 0, 0.05), 0.03, criar_material(Color(0.85, 0.1, 0.08)))
+	criar_segmento(self, menos, menos + Vector3(0, 0, 0.05), 0.03, criar_material(Color(0.06, 0.06, 0.06)))
+	# Cabos: saem dos bornes, descem até a mesa e chegam na ponta das trilhas de cima
+	var borda: float = -(Circuito.COLUNAS * D + 0.3) / 2.0
+	criar_cabo([mais + Vector3(0, 0, 0.05), mais + Vector3(0, -0.2, 0.25), Vector3(borda - 0.3, -0.08, Z_LINHAS[0]), Vector3(borda + 0.05, 0.01, Z_LINHAS[0])], Color(0.85, 0.1, 0.08))
+	criar_cabo([menos + Vector3(0, 0, 0.05), menos + Vector3(0, -0.2, 0.3), Vector3(borda - 0.3, -0.08, Z_LINHAS[1]), Vector3(borda + 0.05, 0.01, Z_LINHAS[1])], Color(0.06, 0.06, 0.06))
+
+
+# Uma caixinha com LEDs e resistores de reserva, só para enfeitar.
+func criar_caixa_de_pecas() -> void:
+	var base := Vector3(3.0, -0.1, -1.0)
+	criar_caixa(self, base + Vector3(0, 0.04, 0), Vector3(0.9, 0.08, 0.6), Color(0.85, 0.75, 0.2))
+	var cores: Array[Color] = [Color(1, 0.1, 0.1), Color(0.1, 0.9, 0.2), Color(1, 0.8, 0.1), Color(0.2, 0.4, 1)]
+	for i in range(cores.size()):
+		for j in range(3):
+			var ponto: Vector3 = base + Vector3(-0.3 + i * 0.2, 0.1, -0.15 + j * 0.15)
+			criar_segmento(self, ponto, ponto + Vector3(0, 0.07, 0), 0.03, criar_material(cores[i], true))
+
+
+func criar_cabo(pontos: Array, cor: Color) -> void:
+	var material := criar_material(cor)
+	for i in range(pontos.size() - 1):
+		criar_segmento(self, pontos[i], pontos[i + 1], 0.016, material)
+
+
+# ===================== Barra da câmera e painéis =====================
+
+# Botões no alto da tela: vistas da câmera e recolher os painéis.
+func criar_barra_camera() -> void:
+	var camada := CanvasLayer.new()
+	add_child(camada)
+	var barra := HBoxContainer.new()
+	camada.add_child(barra)
+	barra.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	barra.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	barra.position.y = 8
+	var opcoes: Dictionary = {"Inclinada (1)": "inclinada", "De cima (2)": "cima", "De frente (3)": "frente"}
+	for texto in opcoes:
+		barra.add_child(criar_botao_pequeno(texto, func() -> void: $PivoCamera.definir_vista(opcoes[texto])))
+	barra.add_child(criar_botao_pequeno("Painéis (H)", alternar_paineis))
+
+
+func criar_botao_pequeno(texto: String, acao: Callable) -> Button:
+	var botao := Button.new()
+	botao.text = texto
+	botao.focus_mode = Control.FOCUS_NONE # não "rouba" as setas do teclado
+	botao.add_theme_font_size_override("font_size", 14)
+	botao.pressed.connect(acao)
+	return botao
+
+
+# Recolhe ou abre todos os painéis da cena (os que usam painel_retratil.gd).
+func alternar_paineis() -> void:
+	paineis_recolhidos = not paineis_recolhidos
+	get_tree().call_group("paineis_retrateis", "definir_recolhido", paineis_recolhidos)
 
 
 # Os 420 furos usam uma MultiMesh: um desenho só, repetido muitas vezes (mais leve).
@@ -492,10 +587,12 @@ func criar_bolinha(cor: Color, raio: float) -> MeshInstance3D:
 func criar_texto(pai: Node, texto: String, tamanho: int, cor: Color) -> Label3D:
 	var rotulo := Label3D.new()
 	rotulo.text = texto
-	rotulo.font_size = tamanho
-	rotulo.pixel_size = 0.0015
+	# Letra com o dobro de pixels e cada pixel com metade do tamanho:
+	# o texto fica do mesmo tamanho, mas mais nítido.
+	rotulo.font_size = tamanho * 2
+	rotulo.pixel_size = 0.00075
 	rotulo.modulate = cor
-	rotulo.outline_size = 8
+	rotulo.outline_size = 16
 	rotulo.outline_modulate = Color(0, 0, 0, 0.6)
 	rotulo.rotation.x = -PI / 2.0 # deitado
 	pai.add_child(rotulo)
