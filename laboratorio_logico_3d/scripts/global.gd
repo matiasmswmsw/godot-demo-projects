@@ -73,6 +73,52 @@ var porta_inicial: String = "AND"
 var recordes: Dictionary = {"descubra": 0, "erro": 0}
 var nivel_liberado: int = 1 # maior nível liberado no "Monte o circuito"
 
+# TEMAS VISUAIS: cores do céu, da bancada e da interface.
+# Cada tema é um dicionário; o menu troca entre eles com o botão "Tema".
+const TEMAS: Array[Dictionary] = [
+	{
+		"nome": "Laboratório (azul)",
+		"ceu_topo": Color(0.3, 0.45, 0.65), "ceu_horizonte": Color(0.75, 0.8, 0.87), "chao": Color(0.36, 0.38, 0.42),
+		"bancada": Color(0.74, 0.76, 0.78), "borda": Color(0.22, 0.24, 0.28), "manta": Color(0.14, 0.34, 0.5),
+		"parede": Color(0.82, 0.86, 0.9), "letreiro": Color(0.14, 0.3, 0.45),
+		"botao": Color(0.16, 0.24, 0.36), "botao_hover": Color(0.22, 0.34, 0.5), "destaque": Color(0.95, 0.65, 0.1),
+		"painel": Color(0.06, 0.08, 0.12, 0.85), "painel_borda": Color(0.25, 0.4, 0.6),
+	},
+	{
+		"nome": "Placa de circuito (verde)",
+		"ceu_topo": Color(0.05, 0.18, 0.12), "ceu_horizonte": Color(0.2, 0.45, 0.3), "chao": Color(0.06, 0.12, 0.09),
+		"bancada": Color(0.1, 0.32, 0.2), "borda": Color(0.75, 0.6, 0.25), "manta": Color(0.05, 0.2, 0.12),
+		"parede": Color(0.08, 0.25, 0.16), "letreiro": Color(0.85, 0.7, 0.3),
+		"botao": Color(0.08, 0.3, 0.18), "botao_hover": Color(0.12, 0.42, 0.26), "destaque": Color(0.9, 0.75, 0.3),
+		"painel": Color(0.03, 0.1, 0.06, 0.88), "painel_borda": Color(0.75, 0.6, 0.25),
+	},
+	{
+		"nome": "Neon (noite)",
+		"ceu_topo": Color(0.04, 0.02, 0.1), "ceu_horizonte": Color(0.3, 0.05, 0.35), "chao": Color(0.05, 0.03, 0.1),
+		"bancada": Color(0.12, 0.1, 0.2), "borda": Color(0.0, 0.9, 1.0), "manta": Color(0.08, 0.05, 0.15),
+		"parede": Color(0.1, 0.06, 0.2), "letreiro": Color(1.0, 0.2, 0.8),
+		"botao": Color(0.25, 0.08, 0.35), "botao_hover": Color(0.4, 0.12, 0.5), "destaque": Color(0.0, 0.95, 1.0),
+		"painel": Color(0.05, 0.02, 0.1, 0.88), "painel_borda": Color(1.0, 0.2, 0.8),
+	},
+	{
+		"nome": "Oficina (madeira)",
+		"ceu_topo": Color(0.55, 0.62, 0.7), "ceu_horizonte": Color(0.95, 0.85, 0.7), "chao": Color(0.3, 0.25, 0.2),
+		"bancada": Color(0.55, 0.38, 0.22), "borda": Color(0.3, 0.2, 0.12), "manta": Color(0.25, 0.25, 0.27),
+		"parede": Color(0.9, 0.86, 0.78), "letreiro": Color(0.45, 0.25, 0.1),
+		"botao": Color(0.4, 0.26, 0.14), "botao_hover": Color(0.52, 0.35, 0.2), "destaque": Color(0.95, 0.8, 0.4),
+		"painel": Color(0.18, 0.12, 0.07, 0.88), "painel_borda": Color(0.75, 0.55, 0.3),
+	},
+	{
+		"nome": "Claro (minimalista)",
+		"ceu_topo": Color(0.85, 0.88, 0.92), "ceu_horizonte": Color(0.97, 0.97, 0.98), "chao": Color(0.8, 0.82, 0.85),
+		"bancada": Color(0.95, 0.95, 0.96), "borda": Color(0.85, 0.3, 0.25), "manta": Color(0.85, 0.87, 0.9),
+		"parede": Color(0.98, 0.98, 0.99), "letreiro": Color(0.85, 0.3, 0.25),
+		"botao": Color(0.3, 0.35, 0.42), "botao_hover": Color(0.4, 0.46, 0.55), "destaque": Color(0.9, 0.35, 0.25),
+		"painel": Color(0.15, 0.17, 0.2, 0.85), "painel_borda": Color(0.85, 0.3, 0.25),
+	},
+]
+var tema_atual: int = 0
+
 # Arquivo onde os dados ficam salvos ("user://" é uma pasta do usuário no computador).
 const ARQUIVO_DADOS: String = "user://dados.json"
 
@@ -86,6 +132,52 @@ const CENAS_DOS_MODOS: Dictionary = {
 # _ready() é chamada uma vez, quando o nó fica pronto.
 func _ready() -> void:
 	carregar_dados()
+	aplicar_tema_interface()
+
+
+func tema() -> Dictionary:
+	return TEMAS[tema_atual]
+
+
+# Passa para o próximo tema (volta ao primeiro depois do último) e salva.
+func proximo_tema() -> void:
+	tema_atual = (tema_atual + 1) % TEMAS.size()
+	aplicar_tema_interface()
+	salvar_dados()
+
+
+# Muda as cores dos botões e painéis do tema.tres (vale para todas as telas).
+func aplicar_tema_interface() -> void:
+	var visual: Theme = load("res://tema.tres")
+	var t: Dictionary = tema()
+	(visual.get_stylebox("normal", "Button") as StyleBoxFlat).bg_color = t["botao"]
+	(visual.get_stylebox("hover", "Button") as StyleBoxFlat).bg_color = t["botao_hover"]
+	(visual.get_stylebox("pressed", "Button") as StyleBoxFlat).bg_color = t["destaque"]
+	var painel := visual.get_stylebox("panel", "PanelContainer") as StyleBoxFlat
+	painel.bg_color = t["painel"]
+	painel.border_color = t["painel_borda"]
+	visual.emit_changed() # avisa as telas para se redesenharem
+
+
+# Cria um ambiente (céu + luz) com as cores do tema atual.
+func criar_ambiente() -> Environment:
+	var t: Dictionary = tema()
+	var material := ProceduralSkyMaterial.new()
+	material.sky_top_color = t["ceu_topo"]
+	material.sky_horizon_color = t["ceu_horizonte"]
+	material.ground_horizon_color = t["ceu_horizonte"]
+	material.ground_bottom_color = t["chao"]
+	var ceu := Sky.new()
+	ceu.sky_material = material
+	var ambiente := Environment.new()
+	ambiente.background_mode = Environment.BG_SKY
+	ambiente.sky = ceu
+	ambiente.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	ambiente.ambient_light_energy = 0.7
+	ambiente.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	ambiente.glow_enabled = true
+	ambiente.glow_intensity = 0.5
+	return ambiente
 
 
 # Calcula a saída S de uma porta lógica a partir das entradas A e B.
@@ -164,7 +256,7 @@ func liberar_nivel(nivel: int) -> void:
 
 
 func salvar_dados() -> void:
-	var dados: Dictionary = {"recordes": recordes, "nivel_liberado": nivel_liberado}
+	var dados: Dictionary = {"recordes": recordes, "nivel_liberado": nivel_liberado, "tema": tema_atual}
 	var arquivo := FileAccess.open(ARQUIVO_DADOS, FileAccess.WRITE)
 	if arquivo == null:
 		# Tratamento de erro: o jogo continua, só não salva.
@@ -189,3 +281,4 @@ func carregar_dados() -> void:
 		for modo in recordes.keys():
 			recordes[modo] = int(dados["recordes"].get(modo, 0))
 	nivel_liberado = clampi(int(dados.get("nivel_liberado", 1)), 1, 5)
+	tema_atual = clampi(int(dados.get("tema", 0)), 0, TEMAS.size() - 1)

@@ -118,6 +118,12 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Monte o circuito"
 
+[node name="BotaoTema" type="Button" parent="Interface/Tela/Coluna"]
+custom_minimum_size = Vector2(340, 46)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Tema"
+
 [node name="BotaoSair" type="Button" parent="Interface/Tela/Coluna"]
 custom_minimum_size = Vector2(340, 46)
 layout_mode = 2

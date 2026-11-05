@@ -236,16 +236,18 @@ func criar_placa() -> void:
 
 # O "cenário": bancada, manta antiestática, parede, fonte de 5 V e caixa de peças.
 func criar_laboratorio() -> void:
+	var t: Dictionary = Global.tema() # cores do tema escolhido no menu
+	$Ambiente.environment = Global.criar_ambiente()
 	# Bancada cinza-clara com borda escura
-	criar_caixa(self, Vector3(0, -0.16, 0.4), Vector3(9.0, 0.12, 5.4), Color(0.74, 0.76, 0.78))
-	criar_caixa(self, Vector3(0, -0.16, 3.12), Vector3(9.0, 0.14, 0.06), Color(0.22, 0.24, 0.28))
+	criar_caixa(self, Vector3(0, -0.16, 0.4), Vector3(9.0, 0.12, 5.4), t["bancada"])
+	criar_caixa(self, Vector3(0, -0.16, 3.12), Vector3(9.0, 0.14, 0.06), t["borda"])
 	# Manta antiestática azul (usada em laboratório para não estragar os CIs)
-	criar_caixa(self, Vector3(0, -0.097, 0), Vector3(5.0, 0.008, 3.0), Color(0.14, 0.34, 0.5))
+	criar_caixa(self, Vector3(0, -0.097, 0), Vector3(5.0, 0.008, 3.0), t["manta"])
 	# Chão e parede do fundo
-	criar_caixa(self, Vector3(0, -1.2, 0), Vector3(40, 0.1, 40), Color(0.36, 0.38, 0.42))
-	criar_caixa(self, Vector3(0, 0.9, -3.1), Vector3(16, 4.0, 0.1), Color(0.82, 0.86, 0.9))
-	criar_caixa(self, Vector3(0, 0.25, -3.04), Vector3(16, 0.08, 0.02), Color(0.14, 0.34, 0.5))
-	var placa := criar_texto(self, "LABORATÓRIO DE ELETRÔNICA DIGITAL", 120, Color(0.14, 0.3, 0.45))
+	criar_caixa(self, Vector3(0, -1.2, 0), Vector3(40, 0.1, 40), t["chao"])
+	criar_caixa(self, Vector3(0, 0.9, -3.1), Vector3(16, 4.0, 0.1), t["parede"])
+	criar_caixa(self, Vector3(0, 0.25, -3.04), Vector3(16, 0.08, 0.02), t["borda"])
+	var placa := criar_texto(self, "LABORATÓRIO DE ELETRÔNICA DIGITAL", 120, t["letreiro"])
 	placa.rotation = Vector3.ZERO # em pé, na parede
 	placa.position = Vector3(0, 1.3, -3.03)
 	criar_fonte()

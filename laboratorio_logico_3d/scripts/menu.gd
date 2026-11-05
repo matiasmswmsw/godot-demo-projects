@@ -21,6 +21,8 @@ func _ready() -> void:
 	$Interface/Tela/Coluna/BotaoErro.pressed.connect(trocar_cena.bind("res://cenas/encontre_erro.tscn"))
 	$Interface/Tela/Coluna/BotaoMontar.pressed.connect(trocar_cena.bind("res://cenas/monte_circuito.tscn"))
 	$Interface/Tela/Coluna/BotaoSair.pressed.connect(_on_botao_sair_pressed)
+	$Interface/Tela/Coluna/BotaoTema.pressed.connect(_on_botao_tema_pressed)
+	aplicar_tema()
 	chip.definir_texto("74HC08\nAND")
 	label_recorde.text = "Recordes: Descubra a porta %d • Encontre o erro %d • Nível liberado: %d" % [
 		Global.recordes["descubra"], Global.recordes["erro"], Global.nivel_liberado]
@@ -34,6 +36,18 @@ func _process(delta: float) -> void:
 	if tempo_pisca >= INTERVALO_PISCA:
 		tempo_pisca = 0.0
 		led.acender(not led.aceso)
+
+
+# Troca o tema (céu, bancada e cores dos botões) e mostra na hora.
+func _on_botao_tema_pressed() -> void:
+	Global.proximo_tema()
+	aplicar_tema()
+
+
+func aplicar_tema() -> void:
+	$Ambiente.environment = Global.criar_ambiente()
+	$Interface/Tela/Coluna/BotaoTema.text = "Tema: " + Global.tema()["nome"]
+	$Interface/Tela/Coluna/Titulo.add_theme_color_override("font_color", Global.tema()["destaque"])
 
 
 func trocar_cena(caminho: String) -> void:
