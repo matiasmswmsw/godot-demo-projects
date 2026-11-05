@@ -1,11 +1,15 @@
 [gd_resource type="Theme" format=3]
 
 [ext_resource type="FontFile" path="res://fontes/Baloo2.ttf" id="1_baloo"]
-[ext_resource type="FontFile" path="res://fontes/VT323-Regular.ttf" id="2_vt323"]
+[ext_resource type="FontFile" path="res://fontes/Orbitron.ttf" id="2_orbitron"]
 
 [sub_resource type="FontVariation" id="baloo_semibold"]
 base_font = ExtResource("1_baloo")
 variation_opentype = {2003265652: 600}
+
+[sub_resource type="FontVariation" id="orbitron_negrito"]
+base_font = ExtResource("2_orbitron")
+variation_opentype = {2003265652: 800}
 
 [sub_resource type="StyleBoxFlat" id="botao_normal"]
 skew = Vector2(0.12, 0)
@@ -95,7 +99,7 @@ corner_radius_bottom_left = 2
 default_font = SubResource("baloo_semibold")
 default_font_size = 20
 TituloHUD/base_type = &"Label"
-TituloHUD/fonts/font = ExtResource("2_vt323")
+TituloHUD/fonts/font = SubResource("orbitron_negrito")
 Label/colors/font_outline_color = Color(0, 0, 0, 0.75)
 Label/constants/outline_size = 4
 Button/colors/font_pressed_color = Color(0.1, 0.08, 0.02, 1)

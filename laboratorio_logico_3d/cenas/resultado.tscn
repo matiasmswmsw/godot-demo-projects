@@ -43,7 +43,7 @@ alignment = 1
 layout_mode = 2
 theme_type_variation = &"TituloHUD"
 theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
-theme_override_font_sizes/font_size = 56
+theme_override_font_sizes/font_size = 36
 text = "Resultado"
 horizontal_alignment = 1
 

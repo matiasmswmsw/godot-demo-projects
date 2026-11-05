@@ -46,6 +46,13 @@ func _on_botao_tema_pressed() -> void:
 
 func aplicar_tema() -> void:
 	$Ambiente.environment = Global.criar_ambiente()
+	# Fundo: placa de circuito gigante atrás do CI e do LED
+	if has_node("FundoPlaca"):
+		$FundoPlaca.free()
+	var fundo: MeshInstance3D = Global.criar_fundo_placa(40.0, 24.0)
+	fundo.name = "FundoPlaca"
+	fundo.position = Vector3(0, 0, -8)
+	add_child(fundo)
 	$Interface/Tela/Coluna/BotaoTema.text = "Tema: " + Global.tema()["nome"]
 	$Interface/Tela/Coluna/Titulo.add_theme_color_override("font_color", Global.tema()["destaque"])
 

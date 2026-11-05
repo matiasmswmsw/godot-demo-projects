@@ -119,6 +119,9 @@ const TEMAS: Array[Dictionary] = [
 ]
 var tema_atual: int = 1 # começa no verde (placa de circuito)
 
+var textura_placa: ImageTexture # guardada para não desenhar de novo
+var tema_da_textura: int = -1
+
 # Arquivo onde os dados ficam salvos ("user://" é uma pasta do usuário no computador).
 const ARQUIVO_DADOS: String = "user://dados.json"
 
@@ -163,21 +166,16 @@ func aplicar_tema_interface() -> void:
 	visual.emit_changed() # avisa as telas para se redesenharem
 
 
-# Cria um ambiente (céu + luz) com as cores do tema atual.
+# Cria um ambiente (cor de fundo + luz) com as cores do tema atual.
+# Sem céu: o fundo de verdade é a placa de circuito gigante (criar_fundo_placa).
 func criar_ambiente() -> Environment:
 	var t: Dictionary = tema()
-	var material := ProceduralSkyMaterial.new()
-	material.sky_top_color = t["ceu_topo"]
-	material.sky_horizon_color = t["ceu_horizonte"]
-	material.ground_horizon_color = t["ceu_horizonte"]
-	material.ground_bottom_color = t["chao"]
-	var ceu := Sky.new()
-	ceu.sky_material = material
 	var ambiente := Environment.new()
-	ambiente.background_mode = Environment.BG_SKY
-	ambiente.sky = ceu
-	ambiente.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	ambiente.ambient_light_energy = 0.7
+	ambiente.background_mode = Environment.BG_COLOR
+	ambiente.background_color = t["chao"]
+	ambiente.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	ambiente.ambient_light_color = t["ceu_horizonte"].lerp(Color.WHITE, 0.5)
+	ambiente.ambient_light_energy = 0.6
 	ambiente.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	ambiente.glow_enabled = true
 	ambiente.glow_intensity = 0.5
@@ -286,3 +284,73 @@ func carregar_dados() -> void:
 			recordes[modo] = int(dados["recordes"].get(modo, 0))
 	nivel_liberado = clampi(int(dados.get("nivel_liberado", 1)), 1, 5)
 	tema_atual = clampi(int(dados.get("tema", 0)), 0, TEMAS.size() - 1)
+
+
+# ===================== Fundo: placa de circuito gigante =====================
+# Desenha uma imagem 1024 x 1024 pixel a pixel: trilhas de cobre e pontos de solda.
+# Usa sempre a mesma "semente" do sorteio, então a placa sai igual toda vez.
+func textura_da_placa() -> ImageTexture:
+	if textura_placa != null and tema_da_textura == tema_atual:
+		return textura_placa
+	var t: Dictionary = tema()
+	var tamanho: int = 1024
+	var imagem := Image.create(tamanho, tamanho, false, Image.FORMAT_RGB8)
+	imagem.fill(t["bancada"].darkened(0.35))
+	var cobre: Color = t["borda"]
+	var sorteio := RandomNumberGenerator.new()
+	sorteio.seed = 74 # 74 como os CIs 74HC :)
+	for i in range(140): # 140 trilhas
+		var x: int = sorteio.randi_range(0, tamanho / 16 - 1) * 16
+		var y: int = sorteio.randi_range(0, tamanho / 16 - 1) * 16
+		var passos: int = sorteio.randi_range(4, 14)
+		_ponto_de_solda(imagem, x, y, cobre)
+		for p in range(passos):
+			var direcao: int = sorteio.randi_range(0, 3) # 0 direita, 1 baixo, 2 diagonal, 3 esquerda
+			var comprimento: int = sorteio.randi_range(2, 6) * 16
+			for k in range(comprimento):
+				match direcao:
+					0: x += 1
+					1: y += 1
+					2:
+						x += 1
+						y += 1
+					3: x -= 1
+				x = clampi(x, 0, tamanho - 4)
+				y = clampi(y, 0, tamanho - 4)
+				imagem.fill_rect(Rect2i(x, y, 4, 4), cobre)
+		_ponto_de_solda(imagem, x, y, cobre)
+	# Fileiras de furos, como as de um CI
+	for linha in range(6):
+		var y0: int = sorteio.randi_range(2, 60) * 16
+		var x0: int = sorteio.randi_range(2, 50) * 16
+		for k in range(7):
+			_ponto_de_solda(imagem, x0 + k * 24, y0, cobre)
+			_ponto_de_solda(imagem, x0 + k * 24, y0 + 72, cobre)
+	imagem.generate_mipmaps() # versões menores: a imagem fica nítida de longe também
+	textura_placa = ImageTexture.create_from_image(imagem)
+	tema_da_textura = tema_atual
+	return textura_placa
+
+
+# Um ponto de solda: quadrado de cobre com um furo escuro no meio.
+func _ponto_de_solda(imagem: Image, x: int, y: int, cobre: Color) -> void:
+	var limite: int = imagem.get_width() - 12
+	x = clampi(x - 4, 0, limite)
+	y = clampi(y - 4, 0, limite)
+	imagem.fill_rect(Rect2i(x, y, 12, 12), cobre)
+	imagem.fill_rect(Rect2i(x + 4, y + 4, 4, 4), cobre.darkened(0.7))
+
+
+# Um "quadro" plano gigante com a placa desenhada, para ficar atrás da cena.
+func criar_fundo_placa(largura: float, altura: float) -> MeshInstance3D:
+	var quadro := MeshInstance3D.new()
+	var malha := QuadMesh.new()
+	malha.size = Vector2(largura, altura)
+	quadro.mesh = malha
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = textura_da_placa()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED # não depende da luz
+	material.uv1_scale = Vector3(largura / 8.0, altura / 8.0, 1) # repete a imagem a cada 8 unidades
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	quadro.material_override = material
+	return quadro

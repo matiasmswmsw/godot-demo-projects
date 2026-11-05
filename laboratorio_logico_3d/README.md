@@ -43,7 +43,7 @@ Se o Godot perguntar se quer converter o projeto para a versão nova, pode aceit
 laboratorio_logico_3d/
 ├── project.godot        configuração do projeto (cena inicial, autoload, tela)
 ├── tema.tres            visual dos botões e painéis (estilo HUD)
-├── fontes/              VT323 (títulos) e Baloo 2 (textos), licença OFL
+├── fontes/              Orbitron (títulos) e Baloo 2 (textos), licença OFL
 ├── cenas/
 │   ├── menu.tscn            tela inicial (3D + botões)
 │   ├── aprender.tscn        pinagem, teoria e "como jogar"

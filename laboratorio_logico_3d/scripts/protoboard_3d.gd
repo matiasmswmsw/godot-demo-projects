@@ -245,7 +245,9 @@ func criar_laboratorio() -> void:
 	criar_caixa(self, Vector3(0, -0.097, 0), Vector3(5.0, 0.008, 3.0), t["manta"])
 	# Chão e parede do fundo
 	criar_caixa(self, Vector3(0, -1.2, 0), Vector3(40, 0.1, 40), t["chao"])
-	criar_caixa(self, Vector3(0, 0.9, -3.1), Vector3(16, 4.0, 0.1), t["parede"])
+	var fundo: MeshInstance3D = Global.criar_fundo_placa(24.0, 10.0) # parede = placa gigante
+	fundo.position = Vector3(0, 2.0, -3.1)
+	add_child(fundo)
 	criar_caixa(self, Vector3(0, 0.25, -3.04), Vector3(16, 0.08, 0.02), t["borda"])
 	var placa := criar_texto(self, "LABORATÓRIO DE ELETRÔNICA DIGITAL", 120, t["letreiro"])
 	placa.rotation = Vector3.ZERO # em pé, na parede

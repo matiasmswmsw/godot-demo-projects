@@ -37,7 +37,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_type_variation = &"TituloHUD"
 theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 23
 text = "MONTE O CIRCUITO"
 
 [node name="SeletorNiveis" type="HBoxContainer" parent="Interface/Tela/PainelObjetivo/Coluna"]
@@ -91,7 +91,7 @@ theme_override_constants/separation = 8
 [node name="Titulo" type="Label" parent="Interface/Tela/PainelTabela/Coluna"]
 layout_mode = 2
 theme_type_variation = &"TituloHUD"
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 18
 text = "Pedido × Medido"
 
 [node name="Tabela" type="GridContainer" parent="Interface/Tela/PainelTabela/Coluna"]
