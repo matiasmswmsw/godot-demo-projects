@@ -35,7 +35,8 @@ theme_override_constants/separation = 10
 
 [node name="Titulo" type="Label" parent="Interface/Tela/PainelPortas/Coluna"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_type_variation = &"TituloHUD"
+theme_override_font_sizes/font_size = 34
 text = "MODO LIVRE – Escolha a porta:"
 
 [node name="BotoesPortas" type="GridContainer" parent="Interface/Tela/PainelPortas/Coluna"]

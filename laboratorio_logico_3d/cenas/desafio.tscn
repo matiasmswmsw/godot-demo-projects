@@ -34,8 +34,9 @@ layout_mode = 2
 
 [node name="Titulo" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
 layout_mode = 2
+theme_type_variation = &"TituloHUD"
 theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 36
 text = "DESAFIO – CI misterioso"
 
 [node name="LabelRodada" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
@@ -69,6 +70,7 @@ theme_override_constants/separation = 8
 
 [node name="Titulo" type="Label" parent="Interface/Tela/PainelTestes/Coluna"]
 layout_mode = 2
+theme_type_variation = &"TituloHUD"
 text = "Suas anotações:"
 
 [node name="TabelaTestes" type="GridContainer" parent="Interface/Tela/PainelTestes/Coluna"]

@@ -1,54 +1,77 @@
 [gd_resource type="Theme" format=3]
 
+[ext_resource type="FontFile" path="res://fontes/Baloo2.ttf" id="1_baloo"]
+[ext_resource type="FontFile" path="res://fontes/VT323-Regular.ttf" id="2_vt323"]
+
+[sub_resource type="FontVariation" id="baloo_semibold"]
+base_font = ExtResource("1_baloo")
+variation_opentype = {2003265652: 600}
+
 [sub_resource type="StyleBoxFlat" id="botao_normal"]
+skew = Vector2(0.12, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
 bg_color = Color(0.16, 0.24, 0.36, 1)
-border_width_bottom = 3
+border_width_bottom = 1
 border_color = Color(0.08, 0.12, 0.2, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="botao_hover"]
+skew = Vector2(0.12, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
 bg_color = Color(0.22, 0.34, 0.5, 1)
-border_width_bottom = 3
+border_width_bottom = 1
 border_color = Color(0.08, 0.12, 0.2, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="botao_pressionado"]
+skew = Vector2(0.12, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
 bg_color = Color(0.95, 0.65, 0.1, 1)
-border_width_bottom = 3
+border_width_bottom = 1
 border_color = Color(0.6, 0.38, 0.02, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="botao_desativado"]
+skew = Vector2(0.12, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
 bg_color = Color(0.2, 0.2, 0.22, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxEmpty" id="foco"]
 
@@ -63,13 +86,16 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.25, 0.4, 0.6, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [resource]
+default_font = SubResource("baloo_semibold")
 default_font_size = 20
+TituloHUD/base_type = &"Label"
+TituloHUD/fonts/font = ExtResource("2_vt323")
 Label/colors/font_outline_color = Color(0, 0, 0, 0.75)
 Label/constants/outline_size = 4
 Button/colors/font_pressed_color = Color(0.1, 0.08, 0.02, 1)

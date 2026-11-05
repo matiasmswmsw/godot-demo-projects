@@ -71,10 +71,11 @@ theme_override_constants/separation = 10
 
 [node name="Titulo" type="Label" parent="Interface/Tela/Coluna"]
 layout_mode = 2
+theme_type_variation = &"TituloHUD"
 theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 46
+theme_override_font_sizes/font_size = 64
 text = "Laboratório
 Lógico 3D"
 

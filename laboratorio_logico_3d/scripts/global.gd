@@ -89,8 +89,8 @@ const TEMAS: Array[Dictionary] = [
 		"ceu_topo": Color(0.05, 0.18, 0.12), "ceu_horizonte": Color(0.2, 0.45, 0.3), "chao": Color(0.06, 0.12, 0.09),
 		"bancada": Color(0.1, 0.32, 0.2), "borda": Color(0.75, 0.6, 0.25), "manta": Color(0.05, 0.2, 0.12),
 		"parede": Color(0.08, 0.25, 0.16), "letreiro": Color(0.85, 0.7, 0.3),
-		"botao": Color(0.08, 0.3, 0.18), "botao_hover": Color(0.12, 0.42, 0.26), "destaque": Color(0.9, 0.75, 0.3),
-		"painel": Color(0.03, 0.1, 0.06, 0.88), "painel_borda": Color(0.75, 0.6, 0.25),
+		"botao": Color(0.06, 0.18, 0.11), "botao_hover": Color(0.1, 0.3, 0.18), "destaque": Color(0.9, 0.76, 0.36),
+		"painel": Color(0.02, 0.08, 0.05, 0.9), "painel_borda": Color(0.18, 0.48, 0.32),
 	},
 	{
 		"nome": "Neon (noite)",
@@ -150,6 +150,10 @@ func proximo_tema() -> void:
 func aplicar_tema_interface() -> void:
 	var visual: Theme = load("res://tema.tres")
 	var t: Dictionary = tema()
+	# Estilo "painel HUD": botões escuros com borda fina; o destaque é a cor de realce do tema.
+	for estado in ["normal", "hover", "pressed"]:
+		var caixa := visual.get_stylebox(estado, "Button") as StyleBoxFlat
+		caixa.border_color = t["painel_borda"] if estado != "pressed" else t["destaque"]
 	(visual.get_stylebox("normal", "Button") as StyleBoxFlat).bg_color = t["botao"]
 	(visual.get_stylebox("hover", "Button") as StyleBoxFlat).bg_color = t["botao_hover"]
 	(visual.get_stylebox("pressed", "Button") as StyleBoxFlat).bg_color = t["destaque"]
