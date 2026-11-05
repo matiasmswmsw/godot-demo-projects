@@ -78,9 +78,9 @@ var nivel_liberado: int = 1 # maior nível liberado no "Monte o circuito"
 const TEMAS: Array[Dictionary] = [
 	{
 		"nome": "Laboratório (azul)",
-		"ceu_topo": Color(0.3, 0.45, 0.65), "ceu_horizonte": Color(0.75, 0.8, 0.87), "chao": Color(0.36, 0.38, 0.42),
-		"bancada": Color(0.74, 0.76, 0.78), "borda": Color(0.22, 0.24, 0.28), "manta": Color(0.14, 0.34, 0.5),
-		"parede": Color(0.82, 0.86, 0.9), "letreiro": Color(0.14, 0.3, 0.45),
+		"ceu_topo": Color(0.04, 0.1, 0.22), "ceu_horizonte": Color(0.18, 0.32, 0.5), "chao": Color(0.05, 0.08, 0.14),
+		"bancada": Color(0.16, 0.24, 0.36), "borda": Color(0.55, 0.75, 0.95), "manta": Color(0.06, 0.14, 0.26),
+		"parede": Color(0.1, 0.18, 0.3), "letreiro": Color(0.6, 0.8, 1.0),
 		"botao": Color(0.16, 0.24, 0.36), "botao_hover": Color(0.22, 0.34, 0.5), "destaque": Color(0.95, 0.65, 0.1),
 		"painel": Color(0.06, 0.08, 0.12, 0.85), "painel_borda": Color(0.25, 0.4, 0.6),
 	},
@@ -109,15 +109,15 @@ const TEMAS: Array[Dictionary] = [
 		"painel": Color(0.18, 0.12, 0.07, 0.88), "painel_borda": Color(0.75, 0.55, 0.3),
 	},
 	{
-		"nome": "Claro (minimalista)",
-		"ceu_topo": Color(0.85, 0.88, 0.92), "ceu_horizonte": Color(0.97, 0.97, 0.98), "chao": Color(0.8, 0.82, 0.85),
-		"bancada": Color(0.95, 0.95, 0.96), "borda": Color(0.85, 0.3, 0.25), "manta": Color(0.85, 0.87, 0.9),
-		"parede": Color(0.98, 0.98, 0.99), "letreiro": Color(0.85, 0.3, 0.25),
+		"nome": "Grafite (minimalista)",
+		"ceu_topo": Color(0.08, 0.08, 0.09), "ceu_horizonte": Color(0.3, 0.3, 0.32), "chao": Color(0.1, 0.1, 0.11),
+		"bancada": Color(0.22, 0.22, 0.24), "borda": Color(0.85, 0.3, 0.25), "manta": Color(0.13, 0.13, 0.15),
+		"parede": Color(0.18, 0.18, 0.2), "letreiro": Color(0.9, 0.35, 0.28),
 		"botao": Color(0.3, 0.35, 0.42), "botao_hover": Color(0.4, 0.46, 0.55), "destaque": Color(0.9, 0.35, 0.25),
 		"painel": Color(0.15, 0.17, 0.2, 0.85), "painel_borda": Color(0.85, 0.3, 0.25),
 	},
 ]
-var tema_atual: int = 0
+var tema_atual: int = 1 # começa no verde (placa de circuito)
 
 # Arquivo onde os dados ficam salvos ("user://" é uma pasta do usuário no computador).
 const ARQUIVO_DADOS: String = "user://dados.json"
