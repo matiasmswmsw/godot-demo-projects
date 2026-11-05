@@ -102,6 +102,7 @@ const TEMAS: Array[Dictionary] = [
 	},
 	{
 		"nome": "Oficina (madeira)",
+		"forca_placa": 1.0,
 		"ceu_topo": Color(0.55, 0.62, 0.7), "ceu_horizonte": Color(0.95, 0.85, 0.7), "chao": Color(0.3, 0.25, 0.2),
 		"bancada": Color(0.55, 0.38, 0.22), "borda": Color(0.3, 0.2, 0.12), "manta": Color(0.25, 0.25, 0.27),
 		"parede": Color(0.9, 0.86, 0.78), "letreiro": Color(0.45, 0.25, 0.1),
@@ -295,11 +296,14 @@ func textura_da_placa() -> ImageTexture:
 	var t: Dictionary = tema()
 	var tamanho: int = 1024
 	var imagem := Image.create(tamanho, tamanho, false, Image.FORMAT_RGB8)
-	imagem.fill(t["bancada"].darkened(0.35))
-	var cobre: Color = t["borda"]
+	var base: Color = t["bancada"].darkened(0.45)
+	imagem.fill(base)
+	# Cobre "apagado": mistura a cor da trilha com o fundo para não chamar atenção.
+	# A madeira já é discreta, então usa a força 1.0 (cor cheia).
+	var cobre: Color = base.lerp(t["borda"], t.get("forca_placa", 0.3))
 	var sorteio := RandomNumberGenerator.new()
 	sorteio.seed = 74 # 74 como os CIs 74HC :)
-	for i in range(140): # 140 trilhas
+	for i in range(90): # 90 trilhas
 		var x: int = sorteio.randi_range(0, tamanho / 16 - 1) * 16
 		var y: int = sorteio.randi_range(0, tamanho / 16 - 1) * 16
 		var passos: int = sorteio.randi_range(4, 14)
@@ -317,7 +321,7 @@ func textura_da_placa() -> ImageTexture:
 					3: x -= 1
 				x = clampi(x, 0, tamanho - 4)
 				y = clampi(y, 0, tamanho - 4)
-				imagem.fill_rect(Rect2i(x, y, 4, 4), cobre)
+				imagem.fill_rect(Rect2i(x, y, 2, 2), cobre) # trilha fina
 		_ponto_de_solda(imagem, x, y, cobre)
 	# Fileiras de furos, como as de um CI
 	for linha in range(6):
