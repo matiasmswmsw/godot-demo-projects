@@ -60,7 +60,7 @@ autowrap_mode = 2
 custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Clique num furo e depois noutro para ligar um fio. Furos da mesma coluna de 5 (a–e ou f–j) já estão ligados por dentro. CIs, LEDs e resistores estão fixos."
+text = "Clique num furo e depois noutro para ligar um fio. Furos da mesma coluna de 5 (a–e ou f–j) já estão ligados por dentro. Clique na ponta de um fio seu para removê-lo. CIs, LEDs e resistores estão fixos."
 autowrap_mode = 2
 
 [node name="LabelStatus" type="Label" parent="Interface/Tela/PainelObjetivo/Coluna"]

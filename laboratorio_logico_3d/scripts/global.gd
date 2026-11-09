@@ -71,6 +71,9 @@ var porta_inicial: String = "AND"
 
 # Dados salvos no computador.
 var recordes: Dictionary = {"descubra": 0, "erro": 0}
+# Ranking: as 5 melhores pontuações de cada modo, em ordem (Bubble Sort).
+var rankings: Dictionary = {"descubra": [], "erro": []}
+const TAMANHO_RANKING: int = 5
 var nivel_liberado: int = 1 # maior nível liberado no "Monte o circuito"
 
 # TEMAS VISUAIS: cores do céu, da bancada e da interface.
@@ -137,6 +140,14 @@ const CENAS_DOS_MODOS: Dictionary = {
 func _ready() -> void:
 	carregar_dados()
 	aplicar_tema_interface()
+	criar_sons()
+	criar_ajuda()
+
+
+# F1 abre/fecha a ajuda em qualquer tela.
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F1:
+		alternar_ajuda()
 
 
 func tema() -> Dictionary:
@@ -259,7 +270,7 @@ func liberar_nivel(nivel: int) -> void:
 
 
 func salvar_dados() -> void:
-	var dados: Dictionary = {"recordes": recordes, "nivel_liberado": nivel_liberado, "tema": tema_atual}
+	var dados: Dictionary = {"recordes": recordes, "rankings": rankings, "nivel_liberado": nivel_liberado, "tema": tema_atual}
 	var arquivo := FileAccess.open(ARQUIVO_DADOS, FileAccess.WRITE)
 	if arquivo == null:
 		# Tratamento de erro: o jogo continua, só não salva.
@@ -283,6 +294,13 @@ func carregar_dados() -> void:
 	if typeof(dados.get("recordes")) == TYPE_DICTIONARY:
 		for modo in recordes.keys():
 			recordes[modo] = int(dados["recordes"].get(modo, 0))
+	if typeof(dados.get("rankings")) == TYPE_DICTIONARY:
+		for modo in rankings.keys():
+			var lista = dados["rankings"].get(modo, [])
+			if typeof(lista) == TYPE_ARRAY:
+				rankings[modo] = []
+				for valor in lista:
+					rankings[modo].append(int(valor))
 	nivel_liberado = clampi(int(dados.get("nivel_liberado", 1)), 1, 5)
 	tema_atual = clampi(int(dados.get("tema", 0)), 0, TEMAS.size() - 1)
 
@@ -358,3 +376,117 @@ func criar_fundo_placa(largura: float, altura: float) -> MeshInstance3D:
 	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	quadro.material_override = material
 	return quadro
+
+
+# ===================== Ranking com Bubble Sort =====================
+# Coloca a pontuação no ranking do modo atual, ordena e guarda só as 5 melhores.
+# Retorna a posição (1 a 5) ou 0 se não entrou no ranking.
+func adicionar_ao_ranking(pontuacao: int) -> int:
+	var lista: Array = rankings[modo_atual]
+	lista.append(pontuacao)
+	bubble_sort_decrescente(lista)
+	while lista.size() > TAMANHO_RANKING:
+		lista.pop_back() # tira a menor
+	salvar_dados()
+	var posicao: int = lista.find(pontuacao)
+	return posicao + 1 # find devolve -1 quando não acha: vira 0
+
+
+# BUBBLE SORT: compara vizinhos e troca quando estão fora de ordem.
+# A cada passada, o menor valor "afunda" para o fim da lista.
+func bubble_sort_decrescente(lista: Array) -> void:
+	var n: int = lista.size()
+	for passada in range(n - 1):
+		var trocou: bool = false
+		for i in range(n - 1 - passada): # o fim da lista já está ordenado
+			if lista[i] < lista[i + 1]:
+				var temporario = lista[i]
+				lista[i] = lista[i + 1]
+				lista[i + 1] = temporario
+				trocou = true
+		if not trocou:
+			break # nenhuma troca: a lista já está em ordem
+
+
+# ===================== Sons (gerados por código, sem arquivos) =====================
+const TAXA_AMOSTRAS: int = 22050 # amostras por segundo
+var sons: Dictionary = {}
+var tocador: AudioStreamPlayer
+
+
+func criar_sons() -> void:
+	tocador = AudioStreamPlayer.new()
+	tocador.volume_db = -8.0
+	add_child(tocador)
+	# [frequência em Hz, duração em segundos] de cada nota
+	sons["clique"] = criar_som([[1400.0, 0.03]], false)
+	sons["fio"] = criar_som([[900.0, 0.05]], false)
+	sons["acerto"] = criar_som([[660.0, 0.09], [880.0, 0.09], [1320.0, 0.16]], false)
+	sons["erro"] = criar_som([[160.0, 0.32]], true)
+
+
+# Monta um som com uma sequência de notas. quadrada = som "áspero" (onda quadrada).
+func criar_som(notas: Array, quadrada: bool) -> AudioStreamWAV:
+	var dados := PackedByteArray()
+	for nota in notas:
+		var frequencia: float = nota[0]
+		var amostras: int = int(nota[1] * TAXA_AMOSTRAS)
+		for i in range(amostras):
+			var t: float = float(i) / TAXA_AMOSTRAS
+			var onda: float = sin(TAU * frequencia * t)
+			if quadrada:
+				onda = signf(onda)
+			var volume: float = 1.0 - float(i) / amostras # vai sumindo no fim da nota
+			var valor: int = int(onda * volume * 9000.0)
+			dados.append(valor & 0xFF) # 16 bits: byte de baixo...
+			dados.append((valor >> 8) & 0xFF) # ...e byte de cima
+	var som := AudioStreamWAV.new()
+	som.format = AudioStreamWAV.FORMAT_16_BITS
+	som.mix_rate = TAXA_AMOSTRAS
+	som.stereo = false
+	som.data = dados
+	return som
+
+
+func tocar_som(nome: String) -> void:
+	if sons.has(nome) and tocador != null:
+		tocador.stream = sons[nome]
+		tocador.play()
+
+
+# ===================== Ajuda (F1) =====================
+var camada_ajuda: CanvasLayer
+
+
+func criar_ajuda() -> void:
+	camada_ajuda = CanvasLayer.new()
+	camada_ajuda.layer = 100 # por cima de tudo
+	camada_ajuda.visible = false
+	add_child(camada_ajuda)
+	var painel := PanelContainer.new()
+	painel.set_anchors_preset(Control.PRESET_CENTER)
+	painel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	painel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	camada_ajuda.add_child(painel)
+	var texto := RichTextLabel.new()
+	texto.bbcode_enabled = true
+	texto.fit_content = true
+	texto.custom_minimum_size = Vector2(620, 0)
+	texto.text = """[font_size=26][b]Controles[/b][/font_size]
+[b]Chaves:[/b] clique, ou teclas A, B e C
+[b]Girar a câmera:[/b] botão direito + arrastar, ou setas
+[b]Mover a câmera:[/b] botão do meio (ou Shift + direito) + arrastar, ou Shift + setas
+[b]Zoom:[/b] roda do mouse, ou + e −
+[b]Vistas prontas:[/b] 1 inclinada • 2 de cima • 3 de frente
+[b]Recolher painéis:[/b] H, ou clique no título do painel
+[b]Furos:[/b] passe o mouse para ver o nome e o pino do CI
+[b]Monte o circuito:[/b] clique num furo e depois noutro para ligar um fio;
+clique na ponta de um fio seu para removê-lo
+[b]Voltar ao menu:[/b] Esc
+
+Aperte F1 para fechar."""
+	painel.add_child(texto)
+
+
+func alternar_ajuda() -> void:
+	camada_ajuda.visible = not camada_ajuda.visible

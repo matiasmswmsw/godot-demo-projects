@@ -35,6 +35,10 @@ Se o Godot perguntar se quer converter o projeto para a versão nova, pode aceit
 | Zoom | Roda do mouse, ou teclas + e − |
 | Vistas prontas | 1 = inclinada • 2 = de cima • 3 = de frente (ou os botões no alto) |
 | Recolher/abrir os painéis | Tecla **H**, botão "Painéis", ou clicar no título de cada painel |
+| Ver nome do furo e pino do CI | Passar o mouse sobre a protoboard |
+| Remover um fio (Monte o circuito) | Clicar na ponta de um fio seu |
+| Ajuda com todos os controles | **F1** |
+| Testes automáticos | Aprender → "Rodar testes" (ou abrir `cenas/testes.tscn` e apertar F6) |
 | Voltar ao menu | **Esc** |
 
 ## Organização

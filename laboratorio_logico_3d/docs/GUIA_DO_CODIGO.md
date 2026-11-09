@@ -92,6 +92,20 @@ Liga as chaves em todas as combinações, chama `simular()` e compara o LED com 
 
 ---
 
+### `bubble_sort_decrescente()` – global.gd
+O ranking Top 5: compara vizinhos e troca quando estão fora de ordem; a cada passada o menor
+"afunda" para o fim. Se uma passada não troca nada, para antes (`break`).
+
+### `testes.gd` – testes automáticos
+Confere sozinho as 7 tabelas-verdade, a montagem certa de cada porta, os 9 defeitos do
+"Encontre o erro", a solução dos 5 níveis, o Bubble Sort e o arquivo estragado.
+Na banca: Aprender → "Rodar testes" e mostrar tudo OK.
+
+### `criar_som()` – global.gd
+Os sons são gerados por código: uma onda seno (ou quadrada, no erro) calculada amostra por amostra.
+
+---
+
 ## 4. Perguntas prováveis da banca (e respostas curtas)
 
 - **O que é um sinal?** Um aviso que um nó manda quando algo acontece. Outros scripts se conectam a

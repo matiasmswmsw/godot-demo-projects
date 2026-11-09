@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/testes.gd" id="1_testes"]
+
+[node name="Testes" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_testes")
+
+[node name="Fundo" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.08, 0.05, 1)
+
+[node name="Margem" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 24
+
+[node name="Coluna" type="VBoxContainer" parent="Margem"]
+layout_mode = 2
+
+[node name="Titulo" type="Label" parent="Margem/Coluna"]
+layout_mode = 2
+theme_type_variation = &"TituloHUD"
+theme_override_font_sizes/font_size = 30
+text = "TESTES AUTOMÁTICOS"
+
+[node name="Texto" type="RichTextLabel" parent="Margem/Coluna"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 17
+theme_override_font_sizes/bold_font_size = 18
+bbcode_enabled = true
+text = "Rodando..."
+
+[node name="BotaoVoltar" type="Button" parent="Margem/Coluna"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Voltar ao menu"

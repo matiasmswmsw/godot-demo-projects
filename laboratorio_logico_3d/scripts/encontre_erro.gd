@@ -53,6 +53,7 @@ var botoes: Array[Button] = []
 @onready var protoboard = $Protoboard
 @onready var label_rodada: Label = $Interface/Tela/PainelPlacar/Coluna/LabelRodada
 @onready var label_pontos: Label = $Interface/Tela/PainelPlacar/Coluna/LabelPontos
+@onready var label_tempo: Label = $Interface/Tela/PainelPlacar/Coluna/LabelTempo
 @onready var label_porta: Label = $Interface/Tela/PainelPlacar/Coluna/LabelPorta
 @onready var caixa_botoes: VBoxContainer = $Interface/Tela/PainelRespostas/Coluna/Botoes
 @onready var painel_feedback: PanelContainer = $Interface/Tela/PainelFeedback
@@ -72,6 +73,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if rodada_ativa:
 		Global.tempo_total += delta
+		label_tempo.text = "Tempo: %.1f s" % Global.tempo_total
 
 
 func criar_botoes() -> void:
@@ -169,9 +171,11 @@ func _on_resposta(escolha: String) -> void:
 	if escolha == certa:
 		Global.pontos += PONTOS_ACERTO
 		Global.acertos += 1
+		Global.tocar_som("acerto")
 		texto = "Correto! +%d pontos\n" % PONTOS_ACERTO
 		label_feedback.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
 	else:
+		Global.tocar_som("erro")
 		texto = "Errado! Você marcou \"%s\", mas era \"%s\".\n" % [escolha, certa]
 		label_feedback.add_theme_color_override("font_color", Color(1.0, 0.55, 0.45))
 	label_feedback.text = texto + EXPLICACOES[defeito]

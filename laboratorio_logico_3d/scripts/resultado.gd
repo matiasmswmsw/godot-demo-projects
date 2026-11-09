@@ -8,6 +8,7 @@ extends Control
 @onready var label_tempo: Label = $Painel/Coluna/LabelTempo
 @onready var label_mensagem: Label = $Painel/Coluna/LabelMensagem
 @onready var label_recorde: Label = $Painel/Coluna/LabelRecorde
+@onready var label_ranking: Label = $Painel/Coluna/LabelRanking
 
 
 func _ready() -> void:
@@ -23,6 +24,19 @@ func _ready() -> void:
 		label_recorde.text = "Novo recorde!"
 	else:
 		label_recorde.text = "Recorde atual: %d pontos" % Global.recordes[Global.modo_atual]
+	mostrar_ranking(Global.adicionar_ao_ranking(Global.pontos))
+
+
+# Mostra o Top 5 (ordenado com Bubble Sort no Global) e destaca a posição do jogador.
+func mostrar_ranking(posicao: int) -> void:
+	var lista: Array = Global.rankings[Global.modo_atual]
+	var texto: String = "TOP 5\n"
+	for i in range(lista.size()):
+		texto += "%d.  %d pontos" % [i + 1, lista[i]]
+		if i + 1 == posicao:
+			texto += "   ← você"
+		texto += "\n"
+	label_ranking.text = texto
 
 
 # Escolhe uma mensagem de acordo com o número de acertos.

@@ -47,6 +47,10 @@ text = "Montagem 1 de 6"
 layout_mode = 2
 text = "Pontos: 0"
 
+[node name="LabelTempo" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
+layout_mode = 2
+text = "Tempo: 0.0 s"
+
 [node name="LabelPorta" type="Label" parent="Interface/Tela/PainelPlacar/Coluna"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)

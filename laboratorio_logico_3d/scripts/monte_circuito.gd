@@ -142,6 +142,15 @@ func carregar_nivel(n: int) -> void:
 func _on_furo_clicado(furo: Vector2i) -> void:
 	var ocupados: Dictionary = circuito.furos_ocupados()
 	if inicio_fio == SEM_FURO:
+		# Clicou na ponta de um fio do jogador: remove esse fio.
+		var indice: int = fio_do_jogador_em(furo)
+		if indice != -1:
+			var removido: Dictionary = circuito.fios[indice]
+			circuito.fios.remove_at(indice)
+			Global.tocar_som("clique")
+			label_status.text = "Fio %s → %s removido." % [nome_furo(removido["de"]), nome_furo(removido["para"])]
+			protoboard.carregar(circuito)
+			return
 		if ocupados.has(furo):
 			label_status.text = "O furo %s já está ocupado. Use outro furo da mesma coluna." % nome_furo(furo)
 			return
@@ -156,10 +165,20 @@ func _on_furo_clicado(furo: Vector2i) -> void:
 		label_status.text = "O furo %s já está ocupado. Use outro furo da mesma coluna." % nome_furo(furo)
 	else:
 		circuito.adicionar_fio(inicio_fio, furo, cor_fio)
+		Global.tocar_som("fio")
 		label_status.text = "Fio ligado: %s → %s (%d fios seus)" % [nome_furo(inicio_fio), nome_furo(furo), contar_fios_jogador()]
 		inicio_fio = SEM_FURO
 		protoboard.destacar_inicio(SEM_FURO)
 		protoboard.carregar(circuito)
+
+
+# Índice do fio do jogador que tem uma ponta neste furo (-1 se não tiver).
+func fio_do_jogador_em(furo: Vector2i) -> int:
+	for i in range(circuito.fios.size()):
+		var fio: Dictionary = circuito.fios[i]
+		if not fio["fixo"] and (fio["de"] == furo or fio["para"] == furo):
+			return i
+	return -1
 
 
 # Nome de um furo como na protoboard de verdade: fileira + coluna (ex.: "e13").
@@ -268,6 +287,7 @@ func testar_circuito() -> void:
 
 	if tudo_certo and problemas.is_empty():
 		label_resultado.text = "Circuito correto! Parabéns!"
+		Global.tocar_som("acerto")
 		label_resultado.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
 		if nivel < NIVEIS.size():
 			Global.liberar_nivel(nivel + 1)
@@ -278,6 +298,7 @@ func testar_circuito() -> void:
 		if not problemas.is_empty():
 			texto += "\n" + "\n".join(PackedStringArray(problemas))
 		label_resultado.text = texto
+		Global.tocar_som("erro")
 		label_resultado.add_theme_color_override("font_color", Color(1.0, 0.6, 0.5))
 
 

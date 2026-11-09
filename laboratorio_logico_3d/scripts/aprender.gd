@@ -20,6 +20,8 @@ func _ready() -> void:
 	botao_como_jogar.pressed.connect(_on_botao_como_jogar_pressed)
 	botao_protoboard.pressed.connect(_on_botao_protoboard_pressed)
 	botao_voltar.pressed.connect(voltar_ao_menu)
+	$Margem/Linhas/ColunaBotoes/BotaoTestes.pressed.connect(
+		func() -> void: get_tree().change_scene_to_file("res://cenas/testes.tscn"))
 	mostrar_ci("74HC08")
 
 

@@ -2,7 +2,7 @@
 # MODO DESAFIO (jogo): o CI mostra "?" e esconde uma porta lógica sorteada.
 # O jogador testa as chaves, observa o LED e tenta descobrir qual é a porta.
 # São várias rodadas; no final o jogo vai para a tela de resultado.
-# Dica para quem conhece a pinagem: o 74HC02 (NOR) é ligado diferente dos outros!
+# Os fios de sinal ficam escondidos (ocultar_sinais) para a ligação não entregar a porta.
 extends Node
 
 # Portas que podem ser sorteadas (a NOT fica de fora porque tem só uma entrada).
@@ -70,6 +70,8 @@ func iniciar_rodada() -> void:
 	habilitar_respostas(true)
 
 	# Monta a porta secreta na protoboard, mas esconde o nome do CI.
+	protoboard.chaves_travadas = false
+	protoboard.ocultar_sinais = true # sem os fios, a ligação do NOR não entrega a resposta
 	protoboard.carregar(Circuito.montagem_correta(porta_secreta))
 	protoboard.definir_texto_ci(0, "74HC??")
 	label_rodada.text = "Rodada %d de %d" % [rodada, Global.total_rodadas]
@@ -131,6 +133,7 @@ func _on_resposta(porta_escolhida: String) -> void:
 		return
 	rodada_ativa = false
 	habilitar_respostas(false)
+	protoboard.chaves_travadas = true # depois de responder, as chaves não mudam mais
 
 	# Revela a porta que estava escondida no CI.
 	protoboard.definir_texto_ci(0, Global.CIS[porta_secreta])
@@ -143,9 +146,11 @@ func _on_resposta(porta_escolhida: String) -> void:
 			texto += " (+%d bônus de rapidez!)" % PONTOS_BONUS
 		Global.pontos += ganhos
 		Global.acertos += 1
+		Global.tocar_som("acerto")
 		label_feedback.text = texto
 		label_feedback.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
 	else:
+		Global.tocar_som("erro")
 		label_feedback.text = "Errado! Você marcou %s, mas era %s.\n%s" % [
 			porta_escolhida, porta_secreta, Global.EXPRESSOES[porta_secreta]]
 		label_feedback.add_theme_color_override("font_color", Color(1.0, 0.45, 0.4))

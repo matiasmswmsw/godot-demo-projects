@@ -39,6 +39,10 @@ var visuais_led: Array[Dictionary] = []
 var visuais_chave: Array[Dictionary] = []
 var tempo: float = 0.0
 var paineis_recolhidos: bool = false
+var chaves_travadas: bool = false # true = cliques e teclas não mexem nas chaves
+var ocultar_sinais: bool = false # true = não desenha os fios de sinal (Descubra a porta)
+var destaques: Array[MeshInstance3D] = [] # quadradinhos que mostram a coluna ligada
+var info_furo: Label3D # texto que aparece ao passar o mouse num furo
 
 
 func _ready() -> void:
@@ -54,6 +58,10 @@ func _ready() -> void:
 	marcador_inicio.visible = false
 	conteudo = Node3D.new()
 	add_child(conteudo)
+	criar_destaques()
+	info_furo = criar_texto(self, "", 44, Color(1, 1, 0.75))
+	info_furo.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	info_furo.no_depth_test = true # sempre por cima de tudo
 	criar_barra_camera()
 
 
@@ -140,9 +148,10 @@ func atualizar() -> Dictionary:
 
 func alternar_chave(nome: String) -> void:
 	var chave: Dictionary = circuito.chave_por_nome(nome) if circuito else {}
-	if chave.is_empty() or not chave["ativa"]:
+	if chave.is_empty() or not chave["ativa"] or chaves_travadas:
 		return
 	chave["ligada"] = not chave["ligada"]
+	Global.tocar_som("clique")
 	atualizar()
 	chave_alternada.emit(nome, chave["ligada"])
 
@@ -313,6 +322,7 @@ func criar_barra_camera() -> void:
 	for texto in opcoes:
 		barra.add_child(criar_botao_pequeno(texto, func() -> void: $PivoCamera.definir_vista(opcoes[texto])))
 	barra.add_child(criar_botao_pequeno("Painéis (H)", alternar_paineis))
+	barra.add_child(criar_botao_pequeno("Ajuda (F1)", Global.alternar_ajuda))
 
 
 func criar_botao_pequeno(texto: String, acao: Callable) -> Button:
@@ -370,19 +380,75 @@ func criar_area_de_clique() -> void:
 	area.add_child(forma)
 	add_child(area)
 	area.input_event.connect(_on_area_input_event)
-	area.mouse_exited.connect(func() -> void: marcador.visible = false)
+	area.mouse_exited.connect(esconder_info_furo)
 
 
 func _on_area_input_event(_camera: Node, event: InputEvent, posicao_clique: Vector3, _normal: Vector3, _forma: int) -> void:
-	if not aceita_furos:
-		return
 	var furo: Vector2i = furo_mais_perto(to_local(posicao_clique))
-	marcador.visible = furo != SEM_FURO
 	if furo == SEM_FURO:
+		esconder_info_furo()
 		return
+	# Passar o mouse: mostra o nome do furo (e o pino do CI, se tiver um).
+	marcador.visible = true
 	marcador.position = posicao(furo) + Vector3(0, 0.02, 0)
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		furo_clicado.emit(furo)
+	info_furo.text = descrever_furo(furo)
+	info_furo.position = posicao(furo) + Vector3(0, 0.25, 0)
+	if aceita_furos:
+		mostrar_coluna_ligada(furo)
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			furo_clicado.emit(furo)
+
+
+func esconder_info_furo() -> void:
+	marcador.visible = false
+	info_furo.text = ""
+	for quadrado in destaques:
+		quadrado.visible = false
+
+
+# Texto do furo: fileira + coluna (ex.: "e13"), e o pino do CI que está nele.
+func descrever_furo(furo: Vector2i) -> String:
+	var texto: String = "%s%d" % [Circuito.NOMES_LINHAS[furo.y], furo.x + 1]
+	if furo.y == 0 or furo.y == 12:
+		return texto + " · trilha + (5 V)"
+	if furo.y == 1 or furo.y == 13:
+		return texto + " · trilha − (GND)"
+	if circuito == null:
+		return texto
+	for ci in circuito.cis:
+		for pino in range(1, 15):
+			if circuito.furo_do_pino(ci, pino) == furo:
+				texto += " · pino %d" % pino
+				if not String(ci["texto"]).contains("?"): # no desafio, não entrega a resposta
+					texto += " (%s)" % Global.nome_do_pino(ci["modelo"], pino)
+				return texto
+	return texto
+
+
+# Quadradinhos amarelos (criados uma vez e reaproveitados).
+func criar_destaques() -> void:
+	for i in range(Circuito.COLUNAS):
+		var quadrado := criar_caixa(self, Vector3.ZERO, Vector3(0.07, 0.006, 0.07), Color(1, 0.85, 0.2))
+		quadrado.material_override.emission_enabled = true
+		quadrado.material_override.emission = Color(1, 0.75, 0.1)
+		quadrado.visible = false
+		destaques.append(quadrado)
+
+
+# Mostra todos os furos ligados por dentro ao furo do mouse.
+func mostrar_coluna_ligada(furo: Vector2i) -> void:
+	var ligados: Array[Vector2i] = []
+	if furo.y in [0, 1, 12, 13]:
+		for coluna in range(Circuito.COLUNAS): # trilha: a fileira inteira
+			ligados.append(Vector2i(coluna, furo.y))
+	else:
+		var primeira: int = 2 if furo.y <= 6 else 7 # metade de cima (a–e) ou de baixo (f–j)
+		for linha in range(primeira, primeira + 5):
+			ligados.append(Vector2i(furo.x, linha))
+	for i in range(destaques.size()):
+		destaques[i].visible = i < ligados.size()
+		if i < ligados.size():
+			destaques[i].position = posicao(ligados[i]) + Vector3(0, 0.004, 0)
 
 
 # ===================== Componentes =====================
@@ -544,13 +610,15 @@ func pintar_led(visual: Dictionary, aceso: bool) -> void:
 
 # Fio em forma de "ponte": sobe, atravessa e desce.
 func criar_fio(fio: Dictionary, indice: int) -> void:
+	if ocultar_sinais and fio["cor"] in ["sinal", "saida"]:
+		return # no "Descubra a porta" os fios de sinal ficam escondidos
 	var a: Vector3 = posicao(fio["de"])
 	var b: Vector3 = posicao(fio["para"])
 	var altura := Vector3(0, 0.05 + (indice % 5) * 0.012, 0) # alturas diferentes para não se encostarem
 	var material := criar_material(CORES_FIO.get(fio["cor"], Color.WHITE))
-	criar_segmento(conteudo, a, a + altura, 0.014, material)
-	criar_segmento(conteudo, a + altura, b + altura, 0.014, material)
-	criar_segmento(conteudo, b + altura, b, 0.014, material)
+	criar_segmento(conteudo, a, a + altura, 0.02, material) # fios mais grossos: mais fáceis de ver
+	criar_segmento(conteudo, a + altura, b + altura, 0.02, material)
+	criar_segmento(conteudo, b + altura, b, 0.02, material)
 
 
 # ===================== Ajudantes de desenho =====================
